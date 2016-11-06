@@ -355,7 +355,17 @@ function handleAddChoreTimeRequest(intent, session, response) {
         return;
     }
 	
+	
+	var howLong = getHowLongAgoFromIntent(intent);
+	if (!howLong) {
+        // Invalid date. set city in session and prompt for date
+        session.attributes.city = cityStation;
+        repromptText = "Please try again saying a day of the week, for example, Saturday. ";
+        speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
 
+        response.ask(speechOutput, repromptText);
+        return;
+    }
 	
     storage.loadChore(session, function (currentChore) {
 
@@ -396,7 +406,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
         currentChore.save(function () {
 			
 		
-			speechOut = "The chore you did was " + choreOut.chore + " . You did it on " + date.requestDateParam + " .";
+			speechOut = "The chore you did was " + choreOut.chore + " . It was " + howLong.displayLong + " ago. You did it on " + date.displayDate + " .";
+			//speechOut = "The chore you did was " + choreOut.chore + " . You did it on " + date.requestDateParam + " .";
 			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
 			
 			
@@ -700,6 +711,40 @@ function getDateFromIntent(intent) {
         }
     }
 }
+
+/**
+ * returns how long ago the date you asked about was
+ */
+function getHowLongAgoFromIntent(intent) {
+
+    var dateSlot = intent.slots.Date;
+    // slots can be missing, or slots can be provided but with empty value.
+    // must test for both.
+    if (!dateSlot || !dateSlot.value) {
+        // default to today
+        return {
+            displayLong: "Just Now",
+        }
+    } else {
+
+        var date = new Date(dateSlot.value);
+        //var date = new Date();
+
+
+        // format the request date like YYYYMMDD
+        var month = (date.getMonth() + 1);
+        month = month < 10 ? '0' + month : month;
+        var dayOfMonth = date.getDate();
+        dayOfMonth = dayOfMonth < 10 ? '0' + dayOfMonth : dayOfMonth;
+        //var requestDay = "begin_date=" + date.getFullYear() + month + dayOfMonth + "&range=24";
+        var requestDay = "" + date.getFullYear() + month + dayOfMonth;
+
+        return {
+            displayLong: alexaDateUtil.getFormattedDate(date),
+        }
+    }
+}
+
 
 function getAllStationsText() {
     var stationList = '';
