@@ -8,6 +8,9 @@ ADD:
 4. add recall #x tasks added
 5. delete all tasks6. delete whichever specific chore
 
+7. remove extraneous code
+
+#info
 I built this on top of alexa tide pooler sample app. also the score keeper app.
 
 tell this baby when you pooped, and it will tell you back when you last pooped. 
