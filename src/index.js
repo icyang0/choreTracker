@@ -1,10 +1,7 @@
 /**
     Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
     Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-
         http://aws.amazon.com/apache2.0/
-
     or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
@@ -399,7 +396,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         currentChore.save(function () {
 			
 		
-			speechOut = "The chore you did was " + choreOut.chore + " . You did it on " + date.displayDate + " .";
+			speechOut = "The chore you did was " + choreOut.chore + " . You did it on " + date.requestDateParam + " .";
 			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
 			
 			
@@ -685,15 +682,17 @@ function getDateFromIntent(intent) {
         }
     } else {
 
-        var date = new Date(dateSlot.value);
+        //var date = new Date(dateSlot.value);
+        var date = new Date();
+		//var testDate = new Date();
 
         // format the request date like YYYYMMDD
         var month = (date.getMonth() + 1);
         month = month < 10 ? '0' + month : month;
         var dayOfMonth = date.getDate();
         dayOfMonth = dayOfMonth < 10 ? '0' + dayOfMonth : dayOfMonth;
-        var requestDay = "begin_date=" + date.getFullYear() + month + dayOfMonth
-            + "&range=24";
+        //var requestDay = "begin_date=" + date.getFullYear() + month + dayOfMonth + "&range=24";
+        var requestDay = "" + date.getFullYear() + month + dayOfMonth;
 
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
@@ -716,4 +715,3 @@ exports.handler = function (event, context) {
     var tidePooler = new TidePooler();
     tidePooler.execute(event, context);
 };
-
