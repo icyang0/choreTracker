@@ -1,3 +1,21 @@
+I built this on top of alexa tide pooler sample app. also the score keeper app.
+
+tell this baby when you pooped, and it will tell you back when you last pooped. 
+
+more seriously, you can ask it to track the last time you took your vitamins, changed the brita filter, or fed your sourdough starter, eyc.
+
+just wanted to make an easy interface to rememeber things i always forget ^^
+
+
+
+
+
+
+
+
+
+
+
 # Sample AWS Lambda function for Alexa
 A simple [AWS Lambda](http://aws.amazon.com/lambda) function that demonstrates how to write a skill for the Amazon Echo using the Alexa SDK.
 
