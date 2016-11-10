@@ -1,22 +1,6 @@
 {
   "intents": [
-    {
-      "intent": "OneshotTideIntent",
-      "slots": [
-        {
-          "name": "City",
-          "type": "LIST_OF_CITIES"
-        },
-        {
-          "name": "State",
-          "type": "LIST_OF_STATES"
-        },
-        {
-          "name": "Date",
-          "type": "AMAZON.DATE"
-        }
-      ]
-    },
+    
     {
       "intent": "AddChoreTimeIntent",
       "slots": [
@@ -39,26 +23,7 @@
         }
       ]
     },
-    {
-      "intent": "DialogTideIntent",
-      "slots": [
-        {
-          "name": "City",
-          "type": "LIST_OF_CITIES"
-        },
-        {
-          "name": "State",
-          "type": "LIST_OF_STATES"
-        },
-        {
-          "name": "Date",
-          "type": "AMAZON.DATE"
-        }
-      ]
-    },
-    {
-      "intent": "SupportedCitiesIntent"
-    },
+    
     {
       "intent": "AMAZON.HelpIntent"
     },
