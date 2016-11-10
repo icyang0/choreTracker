@@ -130,7 +130,6 @@ TidePooler.prototype.intentHandlers = {
     }
 };
 
-// -------------------------- TidePooler Domain Specific Business Logic --------------------------
 
 // example city to NOAA station mapping. Can be found on: http://tidesandcurrents.noaa.gov/map/
 var STATIONS = {
@@ -198,10 +197,6 @@ function handleSupportedCitiesRequest(intent, session, response) {
 
     response.ask(speechOutput, repromptText);
 }
-
-
-
-
 
 /**
  * Handles the dialog step where the user provides a city
@@ -344,10 +339,9 @@ function handleAddChoreTimeRequest(intent, session, response) {
         return;
     }
 	
-    var date = getDateFromIntent(intent);
+    //var date = getDateFromIntent(intent);
+    var date = getDateFromIntent(intent.slots.Date);
 	if (!date) {
-        // Invalid date. set city in session and prompt for date
-        session.attributes.city = cityStation;
         repromptText = "Please try again saying a day of the week, for example, Saturday. ";
         speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
 
@@ -356,7 +350,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
     }
 	
 	
-	var howLong = getHowLongAgoFromIntent(intent);
+	//var howLong = getHowLongAgoFromIntent(intent);
+	var howLong = getHowLongAgoFromIntent(intent.slots.Date);
 	if (!howLong) {
         // Invalid date. set city in session and prompt for date
         session.attributes.city = cityStation;
@@ -396,13 +391,12 @@ function handleAddChoreTimeRequest(intent, session, response) {
             
 		//if the chore the user said wasnt found	
 		if (!targetChore) {
-            //response.ask('Sorry, ' + playerName + ' has not joined the game. What else?', playerName + ' has not joined the game. What else?');
             return;
         }
 		
         //write the new date to the database
-		currentChore.data.dates[targetChore] = date.displayDate;
-
+		//currentChore.data.dates[targetChore] = date.displayDate;
+		currentChore.data.dates[targetChore] = intent.slots.Date;
         currentChore.save(function () {
 			
 		
@@ -420,6 +414,9 @@ function handleAddChoreTimeRequest(intent, session, response) {
 
 /**
  * This handles telling the time of a chore
+ ****************************************************************************
+ ****************************************************************************
+ ****************************************************************************
  */
 function handleTellChoreTimeRequest(intent, session, response) {
 	var speechOut;
@@ -447,7 +444,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 		}
             
 		date = currentChore.data.dates[choreOut.chore];
-		speechOut = "The last time you " + choreOut.chore + " was " + date;
+		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + " ago, on " + getDateFromIntent(date).displayDate;
 		response.tellWithCard(speechOut, "Chore Tracker", speechOut)	
     });
 	
@@ -456,6 +453,9 @@ function handleTellChoreTimeRequest(intent, session, response) {
 
 /**
  * Gets the cHORE NAME from the intent, or returns an error
+ ****************************************************************************
+ ****************************************************************************
+ ****************************************************************************
  */
 function getChoreFromIntent(intent, assignDefault) {
 
@@ -679,10 +679,13 @@ function getCityStationFromIntent(intent, assignDefault) {
 /**
  * Gets the date from the intent, defaulting to today if none provided,
  * or returns an error
+ ****************************************************************************
+ ****************************************************************************
+ ****************************************************************************
  */
-function getDateFromIntent(intent) {
+function getDateFromIntent(dateo) {
 
-    var dateSlot = intent.slots.Date;
+    var dateSlot = dateo;
     // slots can be missing, or slots can be provided but with empty value.
     // must test for both.
     if (!dateSlot || !dateSlot.value) {
@@ -693,9 +696,8 @@ function getDateFromIntent(intent) {
         }
     } else {
 
-        //var date = new Date(dateSlot.value);
-        var date = new Date();
-		//var testDate = new Date();
+        var date = new Date(dateSlot.value);
+        //var date = new Date();
 
         // format the request date like YYYYMMDD
         var month = (date.getMonth() + 1);
@@ -714,10 +716,15 @@ function getDateFromIntent(intent) {
 
 /**
  * returns how long ago the date you asked about was
+  ****************************************************************************
+ ****************************************************************************
+ ****************************************************************************
  */
-function getHowLongAgoFromIntent(intent) {
+//function getHowLongAgoFromIntent(intent) {
+function getHowLongAgoFromIntent(dateo) {
 
-    var dateSlot = intent.slots.Date;
+    //var dateSlot = intent.slots.Date;
+    var dateSlot = dateo;
     // slots can be missing, or slots can be provided but with empty value.
     // must test for both.
     if (!dateSlot || !dateSlot.value) {
@@ -727,20 +734,104 @@ function getHowLongAgoFromIntent(intent) {
         }
     } else {
 
+		var howLong = "";
+		
+		var today = new Date();
         var date = new Date(dateSlot.value);
-        //var date = new Date();
+		
+		
+//actual algo should be implemented at
+// http://www.htmlgoodies.com/html5/javascript/calculating-the-difference-between-two-dates-in-javascript.html
 
+		//totoal years passed
+		howLongY = ((today - date)/(86400000 * 365));
+		//total months passed
+		howLongM = ((today - date)/(86400000 * 30.44)); 
+		//total days passed
+		howLongD = (((today - date)/86400000));
+		
+		howLongM = (howLongM - Math.trunc(howLongY)*12);
+		howLongD = howLongD - ((Math.trunc(howLongM))*30.44) - 365;
+		
+		howLongY = Math.trunc(howLongY);
+		howLongM = Math.trunc(howLongM);
+		howLongD = Math.trunc(howLongD);
+		
+		//1 year 
+		if (howLongY == 1){
+			howLong = "1 year";
+			
+			if (howLongM == 1){
+				howLong = howLong + ", 1 month";
+			} else if (howLongM > 1){
+				howLong = howLong + ", " + howLongM + " months";
+			} else {
+				
+				if (howLongD == 1){
+					howLong = howLong + ", 1 day";
+				} else if (howLongD > 1){
+					howLong = howLong + ", " + howLongD + " days";
+				}
+			}
+			//howLong = howLongY + " years, " + howLongM + " months" + howLongD + " days";
+			
+		}
+		
+		//more than 1 year
+		else if (howLongY >= 2){
+			howLong = howLongY + " years";
+			
+			if (howLongM == 1){
+				howLong = howLong + ", 1 month";
+			} else if (howLongM > 1){
+				howLong = howLong + ", " + howLongM + " months";
+			} else {
+				
+				if (howLongD == 1){
+					howLong = howLong + ", 1 day";
+				} else if (howLongD > 1){
+					howLong = howLong + ", " + howLongD + " days";
+				}
+			}
+			
+		} 
+		//less than one year
+		else {
+			
+			if (howLongM == 1){
+				howLong = "1 month";
+				
+				if (howLongD == 1){
+					howLong = howLong + ", 1 day";
+				} else if (howLongD > 1){
+					howLong = howLong + ", " + howLongD + " days";
+				} 
+		
+		
+			} else if (howLongM > 1){
+				howLong = howLongM + " months";
+				
+				if (howLongD == 1){
+					howLong = howLong + ", 1 day";
+				} else if (howLongD > 1){
+					howLong = howLong + ", " + howLongD + " days";
+				} 
+				
+				
+			} else {
+				
+				if (howLongD == 1){
+					howLong = "1 day";
+				} else if (howLongD > 1){
+					howLong = howLongD + " days";
+				}
+			}
+				
+		}
 
-        // format the request date like YYYYMMDD
-        var month = (date.getMonth() + 1);
-        month = month < 10 ? '0' + month : month;
-        var dayOfMonth = date.getDate();
-        dayOfMonth = dayOfMonth < 10 ? '0' + dayOfMonth : dayOfMonth;
-        //var requestDay = "begin_date=" + date.getFullYear() + month + dayOfMonth + "&range=24";
-        var requestDay = "" + date.getFullYear() + month + dayOfMonth;
-
+		
         return {
-            displayLong: alexaDateUtil.getFormattedDate(date),
+            displayLong: howLong
         }
     }
 }
