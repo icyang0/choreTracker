@@ -23,7 +23,13 @@
         }
       ]
     },
-    
+    {
+      "intent": "DeleteChoreIntent"
+    },
+	    {
+      "intent": "DeleteDBIntent"
+    },
+	
     {
       "intent": "AMAZON.HelpIntent"
     },

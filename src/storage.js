@@ -18,12 +18,16 @@ var storage = (function () {
      * The Chore class stores all Chore states for the user
      */
     function Chore(session, data) {
-        if (data) {
+        //if you passed some new data, load that data into the invocation???
+		if (data) {
             this.data = data;
-        } else {
+        } 
+		
+		//passed no data to new Chore invocation, so you just blank out the data field
+		else {
             this.data = {
                 chores: [],
-                dates: {}
+                dates: [],
             };
         }
         this._session = session;
@@ -35,6 +39,7 @@ var storage = (function () {
             //it can be used as an indication of whether the game has just started
             var allEmpty = true;
             var choreData = this.data;
+			
             choreData.chores.forEach(function (chore) {
                 if (choreData.date[chore] !== 0) {
                     allEmpty = false;

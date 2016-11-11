@@ -60,6 +60,14 @@ TidePooler.prototype.intentHandlers = {
 	"TellChoreTimeIntent": function (intent, session, response) {
         handleTellChoreTimeRequest(intent, session, response);
     },
+	
+	"DeleteChoreIntent": function (intent, session, response) {
+        //handleTellChoreTimeRequest(intent, session, response);
+    },
+	
+	"DeleteDBIntent": function (intent, session, response) {
+        handleDeleteDB(intent, session, response);
+    },
 
     "AMAZON.HelpIntent": function (intent, session, response) {
         handleHelpRequest(response);
@@ -114,56 +122,6 @@ function handleHelpRequest(response) {
     response.ask(speechOutput, repromptText);
 }
 
-
-/**
- * Handles the dialog step where the user provides a date
- */
-function handleDateDialogRequest(intent, session, response) {
-
-    var date = getDateFromIntent(intent),
-        repromptText,
-        speechOutput;
-    if (!date) {
-        repromptText = "Please try again saying a day of the week, for example, Saturday. "
-            + "For which date would you like tide information?";
-        speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
-
-        response.ask(speechOutput, repromptText);
-        return;
-    }
-
-    // if we don't have a city yet, go to city. If we have a city, we perform the final request
-    if (session.attributes.city) {
-        getFinalTideResponse(session.attributes.city, date, response);
-    } else {
-        // The user provided a date out of turn. Set date in session and prompt for city
-        session.attributes.date = date;
-        speechOutput = "For which city would you like tide information for " + date.displayDate + "?";
-        repromptText = "For which city?";
-
-        response.ask(speechOutput, repromptText);
-    }
-}
-
-/**
- * Handle no slots, or slot(s) with no values.
- * In the case of a dialog based skill with multiple slots,
- * when passed a slot with no value, we cannot have confidence
- * it is the correct slot type so we rely on session state to
- * determine the next turn in the dialog, and reprompt.
- */
-function handleNoSlotDialogRequest(intent, session, response) {
-    if (session.attributes.city) {
-        // get date re-prompt
-        var repromptText = "Please try again saying a day of the week, for example, Saturday. ";
-        var speechOutput = repromptText;
-
-        response.ask(speechOutput, repromptText);
-    } else {
-        // get city re-prompt
-        handleSupportedCitiesRequest(intent, session, response);
-    }
-}
 
 
 /**
@@ -290,11 +248,31 @@ function handleTellChoreTimeRequest(intent, session, response) {
 			//response.ask('sorry, no player has joined the game yet, what can I do for you?', 'what can I do for you?');
 			return;
 		}
-            
+		
+        //find the specific date for whatver chore you're looking for
 		date = currentChore.data.dates[choreOut.chore];
+		
+		
 		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + " ago, on " + getDateFromIntent(date).displayDate;
 		response.tellWithCard(speechOut, "Chore Tracker", speechOut)	
     });
+	
+ 
+}
+
+
+/**
+ * This handles deleting the entire DB for a Customer
+ ****************************************************************************
+ ****************************************************************************
+ ****************************************************************************
+ */
+function handleDeleteDB(intent, session, response) {
+	var speechOut = "deleting"
+	storage.newChore(session).save(function () {
+            response.tellWithCard(speechOut, "Chore Tracker", speechOut);
+    });
+	
 	
  
 }
