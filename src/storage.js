@@ -27,7 +27,7 @@ var storage = (function () {
 		else {
             this.data = {
                 chores: [],
-                dates: [],
+                dates: {},
             };
         }
         this._session = session;

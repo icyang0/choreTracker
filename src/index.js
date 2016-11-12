@@ -206,7 +206,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         currentChore.save(function () {
 			
 		
-			speechOut = "The chore you did was " + choreOut.chore + " . It was " + howLong.displayLong + " ago. You did it on " + date.displayDate + " .";
+			speechOut = "The chore you did was " + choreOut.chore + " . It was " + howLong.displayLong + ". You did it on " + date.displayDate + " .";
 			//speechOut = "The chore you did was " + choreOut.chore + " . You did it on " + date.requestDateParam + " .";
 			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
 			
@@ -253,7 +253,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 		date = currentChore.data.dates[choreOut.chore];
 		
 		
-		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + " ago, on " + getDateFromIntent(date).displayDate;
+		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + ", on " + getDateFromIntent(date).displayDate;
 		response.tellWithCard(speechOut, "Chore Tracker", speechOut)	
     });
 	
@@ -368,7 +368,7 @@ function getHowLongAgoFromIntent(dateo) {
         }
     } else {
 
-		var howLong = "";
+		var howLong = "please catch edge case";
 		
 		var today = new Date();
         var date = new Date(dateSlot.value);
@@ -385,7 +385,7 @@ function getHowLongAgoFromIntent(dateo) {
 		howLongD = (((today - date)/86400000));
 		
 		howLongM = (howLongM - Math.trunc(howLongY)*12);
-		howLongD = howLongD - ((Math.trunc(howLongM))*30.44) - 365;
+		howLongD = howLongD - ((Math.trunc(howLongM))*30.44) - (Math.trunc(howLongY)*365);
 		
 		howLongY = Math.trunc(howLongY);
 		howLongM = Math.trunc(howLongM);
@@ -393,21 +393,21 @@ function getHowLongAgoFromIntent(dateo) {
 		
 		//1 year 
 		if (howLongY == 1){
-			howLong = "1 year";
 			
+			howLong = "1 year";
+		
 			if (howLongM == 1){
-				howLong = howLong + ", 1 month";
+				howLong = howLong + ", 1 month ago";
 			} else if (howLongM > 1){
-				howLong = howLong + ", " + howLongM + " months";
+				howLong = howLong + ", " + howLongM + " months ago";
 			} else {
 				
 				if (howLongD == 1){
-					howLong = howLong + ", 1 day";
-				} else if (howLongD > 1){
-					howLong = howLong + ", " + howLongD + " days";
+					howLong = howLong + ", 1 day ago";
+				} else {
+					howLong = howLong + ", " + howLongD + " days ago";
 				}
 			}
-			//howLong = howLongY + " years, " + howLongM + " months" + howLongD + " days";
 			
 		}
 		
@@ -416,53 +416,57 @@ function getHowLongAgoFromIntent(dateo) {
 			howLong = howLongY + " years";
 			
 			if (howLongM == 1){
-				howLong = howLong + ", 1 month";
+				howLong = howLong + ", 1 month ago";
 			} else if (howLongM > 1){
-				howLong = howLong + ", " + howLongM + " months";
+				howLong = howLong + ", " + howLongM + " months ago";
 			} else {
 				
 				if (howLongD == 1){
-					howLong = howLong + ", 1 day";
-				} else if (howLongD > 1){
-					howLong = howLong + ", " + howLongD + " days";
+					howLong = howLong + ", 1 day ago";
+				} else{
+					howLong = howLong + ", " + howLongD + " days ago";
 				}
 			}
 			
 		} 
-		//less than one year
+		//less than one year.. we will not report the year
 		else {
 			
+			//one month
 			if (howLongM == 1){
 				howLong = "1 month";
 				
 				if (howLongD == 1){
-					howLong = howLong + ", 1 day";
-				} else if (howLongD > 1){
-					howLong = howLong + ", " + howLongD + " days";
+					howLong = howLong + ", 1 day ago";
+				} else {
+					howLong = howLong + ", " + howLongD + " days ago";
 				} 
 		
-		
+			//more than one months
 			} else if (howLongM > 1){
 				howLong = howLongM + " months";
 				
 				if (howLongD == 1){
-					howLong = howLong + ", 1 day";
-				} else if (howLongD > 1){
-					howLong = howLong + ", " + howLongD + " days";
+					howLong = howLong + ", 1 day ago";
+				} else {
+					howLong = howLong + ", " + howLongD + " days ago";
 				} 
 				
-				
+			//less than one month, report days only.
 			} else {
-				
+				howLongD = today.getDay() - date.getDay();
 				if (howLongD == 1){
-					howLong = "1 day";
-				} else if (howLongD > 1){
-					howLong = howLongD + " days";
+					howLong = "1 day ago";
+				} else if (howLongD == 0){
+					howLong = "today"
+					
+				} else {
+					howLong = howLongD + " days ago";
 				}
 			}
 				
 		}
-
+		//howLong = howLongY + ", " + howLong;
 		
         return {
             displayLong: howLong
