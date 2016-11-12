@@ -146,7 +146,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
     }
 	
     //var date = getDateFromIntent(intent);
-    var date = getDateFromIntent(intent.slots.Date);
+    //var date = getDateFromIntent(intent.slots.Date);
+    var date = getDateFromIntent(intent.slots.Date.value);
 	if (!date) {
         repromptText = "Please try again saying a day of the week, for example, Saturday. ";
         speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
@@ -157,7 +158,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 	
 	//var howLong = getHowLongAgoFromIntent(intent);
-	var howLong = getHowLongAgoFromIntent(intent.slots.Date);
+	//var howLong = getHowLongAgoFromIntent(intent.slots.Date);
+	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
 	if (!howLong) {
         // Invalid date. set city in session and prompt for date
         session.attributes.city = cityStation;
@@ -201,8 +203,9 @@ function handleAddChoreTimeRequest(intent, session, response) {
         }
 		
         //write the new date to the database
-		//currentChore.data.dates[targetChore] = date.displayDate;
-		currentChore.data.dates[targetChore] = intent.slots.Date;
+
+		//currentChore.data.dates[targetChore] = intent.slots.Date;
+		currentChore.data.dates[targetChore] = intent.slots.Date.value;
         currentChore.save(function () {
 			
 		
@@ -250,10 +253,12 @@ function handleTellChoreTimeRequest(intent, session, response) {
 		}
 		
         //find the specific date for whatver chore you're looking for
-		date = currentChore.data.dates[choreOut.chore];
+		//date = currentChore.data.dates[choreOut.chore];
+		date = new Date(currentChore.data.dates[choreOut.chore]);
 		
 		
-		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + ", on " + getDateFromIntent(date).displayDate;
+		//speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date.value).displayLong + ", on " + getDateFromIntent(date.value).displayDate;
+		speechOut = "The last time you " + choreOut.chore + " was " + (date.value) + ", on " + date;
 		response.tellWithCard(speechOut, "Chore Tracker", speechOut)	
     });
 	
@@ -320,18 +325,19 @@ function getChoreFromIntent(intent, assignDefault) {
 function getDateFromIntent(dateo) {
 
     var dateSlot = dateo;
-    // slots can be missing, or slots can be provided but with empty value.
+/*    
+	// slots can be missing, or slots can be provided but with empty value.
     // must test for both.
     if (!dateSlot || !dateSlot.value) {
         // default to today
         return {
-            displayDate: "Today",
+            displayDate: "Today default",
             requestDateParam: "date=today"
         }
     } else {
-
-        var date = new Date(dateSlot.value);
-        //var date = new Date();
+*/
+        //var date = new Date(dateSlot.value);
+        var date = new Date(dateSlot);
 
         // format the request date like YYYYMMDD
         var month = (date.getMonth() + 1);
@@ -345,7 +351,7 @@ function getDateFromIntent(dateo) {
             displayDate: alexaDateUtil.getFormattedDate(date),
             requestDateParam: requestDay
         }
-    }
+    //}
 }
 
 /**
@@ -359,19 +365,24 @@ function getHowLongAgoFromIntent(dateo) {
 
     //var dateSlot = intent.slots.Date;
     var dateSlot = dateo;
+	
+	
+	
     // slots can be missing, or slots can be provided but with empty value.
     // must test for both.
-    if (!dateSlot || !dateSlot.value) {
+  /*  if (!dateSlot || !dateSlot.value) {
         // default to today
         return {
             displayLong: "Just Now",
         }
-    } else {
-
+    } else { 
+*/
 		var howLong = "please catch edge case";
 		
 		var today = new Date();
-        var date = new Date(dateSlot.value);
+		
+        //var date = new Date(dateSlot.value);
+        var date = new Date(dateSlot);
 		
 		
 //actual algo should be implemented at
@@ -466,12 +477,11 @@ function getHowLongAgoFromIntent(dateo) {
 			}
 				
 		}
-		//howLong = howLongY + ", " + howLong;
 		
         return {
             displayLong: howLong
         }
-    }
+    //}
 }
 
 
