@@ -253,12 +253,10 @@ function handleTellChoreTimeRequest(intent, session, response) {
 		}
 		
         //find the specific date for whatver chore you're looking for
-		//date = currentChore.data.dates[choreOut.chore];
 		date = new Date(currentChore.data.dates[choreOut.chore]);
 		
 		
-		//speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date.value).displayLong + ", on " + getDateFromIntent(date.value).displayDate;
-		speechOut = "The last time you " + choreOut.chore + " was " + (date.value) + ", on " + date;
+		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + ", on " + getDateFromIntent(date).displayDate;
 		response.tellWithCard(speechOut, "Chore Tracker", speechOut)	
     });
 	
