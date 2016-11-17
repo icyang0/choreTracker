@@ -3,12 +3,16 @@
  */
 var APP_ID = "amzn1.ask.skill.2e904383-fe90-473d-9c12-e55ab8caccaf";//replace with 'amzn1.echo-sdk-ams.app.[your-unique-value-here]';
 
+var skillName = "Chore Tracker";
+var choreOrTask = "chore";
 
 'use strict';
 var storage = require('./storage');
 
 var http = require('http'),
     alexaDateUtil = require('./alexaDateUtil');
+	
+var AWS = require("aws-sdk");
 
 /**
  * The AlexaSkill prototype and helper functions
@@ -24,6 +28,8 @@ var AlexaSkill = require('./AlexaSkill');
 var TidePooler = function () {
     AlexaSkill.call(this, APP_ID);
 };
+
+
 
 // Extend AlexaSkill
 TidePooler.prototype = Object.create(AlexaSkill.prototype);
@@ -74,12 +80,12 @@ TidePooler.prototype.intentHandlers = {
     },
 
     "AMAZON.StopIntent": function (intent, session, response) {
-        var speechOutput = "Goodbye";
+        var speechOutput = "Bye";
         response.tell(speechOutput);
     },
 
     "AMAZON.CancelIntent": function (intent, session, response) {
-        var speechOutput = "Goodbye";
+        var speechOutput = "Bye";
         response.tell(speechOutput);
     }
 };
@@ -88,25 +94,9 @@ TidePooler.prototype.intentHandlers = {
 
 
 function handleWelcomeRequest(response) {
-    var whichCityPrompt = "Which city would you like tide information for?",
-        speechOutput = {
-            speech: "<speak>Welcome to Tide Pooler. "
-                + "<audio src='https://s3.amazonaws.com/ask-storage/tidePooler/OceanWaves.mp3'/>"
-                + whichCityPrompt
-                + "</speak>",
-            type: AlexaSkill.speechOutputType.SSML
-        },
-        repromptOutput = {
-            speech: "I can lead you through providing a city and "
-                + "day of the week to get tide information, "
-                + "or you can simply open Tide Pooler and ask a question like, "
-                + "get tide information for Seattle on Saturday. "
-                + "For a list of supported cities, ask what cities are supported. "
-                + whichCityPrompt,
-            type: AlexaSkill.speechOutputType.PLAIN_TEXT
-        };
-
-    response.ask(speechOutput, repromptOutput);
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say something like, Alexa, tell " + skillName + " I cleaned the toilet today."
+		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
+    response.tellWithCard(speechOut, skillName, speechOut)
 }
 
 function handleHelpRequest(response) {
@@ -137,19 +127,17 @@ function handleAddChoreTimeRequest(intent, session, response) {
         speechOutput;
     if (choreOut.error) {
         // invalid city. move to the dialog
-        repromptText = "I couldn't parse that chore. Try again.";
-        // if we received a value for the incorrect city, repeat it to the user, otherwise we received an empty slot
+        repromptText = "I couldn't parse that " + choreOrTask + ". Please try again.";
         speechOutput = repromptText;
 
         response.ask(speechOutput, repromptText);
         return;
     }
 	
-    //var date = getDateFromIntent(intent);
-    //var date = getDateFromIntent(intent.slots.Date);
+
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (!date) {
-        repromptText = "Please try again saying a day of the week, for example, Saturday. ";
+        repromptText = "Please try again by saying any date like today, or Sunday or November tenth twenty fifteen.";
         speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
 
         response.ask(speechOutput, repromptText);
@@ -157,8 +145,6 @@ function handleAddChoreTimeRequest(intent, session, response) {
     }
 	
 	
-	//var howLong = getHowLongAgoFromIntent(intent);
-	//var howLong = getHowLongAgoFromIntent(intent.slots.Date);
 	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
 	if (!howLong) {
         // Invalid date. set city in session and prompt for date
@@ -170,55 +156,41 @@ function handleAddChoreTimeRequest(intent, session, response) {
         return;
     }
 	
-    storage.loadChore(session, function (currentChore) {
+	
+	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+	var choreName = choreOut.chore;
+	var howLongStr = howLong.displayLong;
+	var dateDisplay = date.displayDate;
+	
+	dynamodb.putItem({
+                TableName: "ChoreAppDataTable",
+                Item: {
+                    CustomerId: {
+                        S: session.user.userId
+                    },
+					ChoreName: {
+						S: choreName
+					},
+					DateOfChore: {
+						S: intent.slots.Date.value
+					}
+                }
+            }, function (err, data) {
+                if (err) {
+                    console.log(err, err.stack);
+                }
+                else {
+                    console.log(data);
+                }
+				speechOut = "The chore you did was " + choreName + ". It was " + howLongStr + ". You did it on " + dateDisplay + ".";
+				response.tellWithCard(speechOut, "Chore Tracker", speechOut)
 
-		var targetChore = '';
-		
-		//if there's not already a chore of that name in the database
-		if (currentChore.data.dates[choreOut.chore] == undefined) {
-			currentChore.data.chores.push(choreOut.chore);
-		}
-		
-		//if there are no chores currently... shouldnt happen, so commenting this out
-		/*
-		if (currentChore.data.chores.length < 1) {
-            response.ask('sorry, no player has joined the game yet, what can I do for you?', 'what can I do for you?');
-            return;
-        }
-		*/
-		
-		//loop through the list of chores, to find the chore the user passed
-        for (var i = 0; i < currentChore.data.chores.length; i++) {
-			
-			//if the current chore matches the chore passed to this function
-            if (currentChore.data.chores[i] === choreOut.chore) {
-                targetChore = currentChore.data.chores[i];
-                break;
             }
-        }
-            
-		//if the chore the user said wasnt found	
-		if (!targetChore) {
-            return;
-        }
-		
-        //write the new date to the database
-
-		//currentChore.data.dates[targetChore] = intent.slots.Date;
-		currentChore.data.dates[targetChore] = intent.slots.Date.value;
-        currentChore.save(function () {
-			
-		
-			speechOut = "The chore you did was " + choreOut.chore + " . It was " + howLong.displayLong + ". You did it on " + date.displayDate + " .";
-			//speechOut = "The chore you did was " + choreOut.chore + " . You did it on " + date.requestDateParam + " .";
-			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
-			
-			
-		});
-		
-    });
-
+	);
+	
+	
 }
+
 
 
 /**
@@ -230,13 +202,13 @@ function handleAddChoreTimeRequest(intent, session, response) {
 function handleTellChoreTimeRequest(intent, session, response) {
 	var speechOut;
 	// Determine chore, using default if none provided
-    var choreOut = getChoreFromIntent(intent, true),
+    var choreOut = getChoreFromIntent(intent, false),
         repromptText,
         speechOutput;
+	//if couldnt understand the chore	
     if (choreOut.error) {
         // invalid city. move to the dialog
-        repromptText = "I couldn't parse that chore. Try again.";
-        // if we received a value for the incorrect city, repeat it to the user, otherwise we received an empty slot
+        repromptText = "I couldn't understand that " + choreOrTask + ". Please try again.";
         speechOutput = repromptText;
 
         response.ask(speechOutput, repromptText);
@@ -244,22 +216,36 @@ function handleTellChoreTimeRequest(intent, session, response) {
     }
 	var date;
 	
-	storage.loadChore(session, function (currentChore) {
-        
-		//no chores currently	
-		if (currentChore.data.chores.length < 1) {
-			//response.ask('sorry, no player has joined the game yet, what can I do for you?', 'what can I do for you?');
-			return;
-		}
-		
-        //find the specific date for whatver chore you're looking for
-		date = new Date(currentChore.data.dates[choreOut.chore]);
-		
-		
-		speechOut = "The last time you " + choreOut.chore + " was " + getHowLongAgoFromIntent(date).displayLong + ", on " + getDateFromIntent(date).displayDate;
-		response.tellWithCard(speechOut, "Chore Tracker", speechOut)	
-    });
+	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+	var choreName = choreOut.chore;
 	
+	speechOut = "The last time you " + choreOut.chore + " was ";
+	
+	dynamodb.getItem({
+        TableName: "ChoreAppDataTable",
+            Key: {
+                CustomerId: {
+                    S: session.user.userId
+                },
+				ChoreName: {
+					S: choreName
+				}
+			}
+        }, function (err, data) {
+            var currentChore;
+            if (err) {
+                speechOut = "ERROR OF SOME SORT";
+            } else if (data.Item === undefined) {
+                speechOut = "NO ITEM";
+            } else {
+                currentChoreDate = data.Item.DateOfChore.S;
+				speechOut = speechOut + getHowLongAgoFromIntent(currentChoreDate).displayLong + ", on " + getDateFromIntent(currentChoreDate).displayDate + ".";
+            }
+
+			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
+				
+    });
+
  
 }
 
@@ -268,15 +254,34 @@ function handleTellChoreTimeRequest(intent, session, response) {
  * This handles deleting the entire DB for a Customer
  ****************************************************************************
  ****************************************************************************
- ****************************************************************************
+ ********************************fix MEEEEEE!!!!!!!!!!!!!********************************************
  */
 function handleDeleteDB(intent, session, response) {
 	var speechOut = "deleting"
-	storage.newChore(session).save(function () {
+	/*storage.newChore(session).save(function () {
             response.tellWithCard(speechOut, "Chore Tracker", speechOut);
+    });*/
+	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+	/*dynamodb.DeleteItem({
+        TableName: "ChoreAppDataTable",
+            Key: {
+                CustomerId: {
+                    S: session.user.userId
+                }
+			}
+        }, function (err, data) {
+            if (err) {
+                speechOut = "ERROR OF SOME SORT";
+            } else {
+				speechOut = "Okay, I deleted all of your stored chores";
+            }
+
+			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
+				
     });
-	
-	
+	*/
+	response.tellWithCard(speechOut, "Chore Tracker", speechOut)
  
 }
 
@@ -303,7 +308,6 @@ function getChoreFromIntent(intent, assignDefault) {
             }
         }
     } else {
-        // lookup the city. Sample skill uses well known mapping of a few known cities to station id.
         var choreName = choreSlot.value;
         
         return {
@@ -323,8 +327,8 @@ function getChoreFromIntent(intent, assignDefault) {
 function getDateFromIntent(dateo) {
 
     var dateSlot = dateo;
-/*    
-	// slots can be missing, or slots can be provided but with empty value.
+    
+/*	// slots can be missing, or slots can be provided but with empty value.
     // must test for both.
     if (!dateSlot || !dateSlot.value) {
         // default to today
@@ -334,7 +338,6 @@ function getDateFromIntent(dateo) {
         }
     } else {
 */
-        //var date = new Date(dateSlot.value);
         var date = new Date(dateSlot);
 
         // format the request date like YYYYMMDD
@@ -403,7 +406,7 @@ function getHowLongAgoFromIntent(dateo) {
 		//1 year 
 		if (howLongY == 1){
 			
-			howLong = "1 year";
+			howLong = "about 1 year";
 		
 			if (howLongM == 1){
 				howLong = howLong + ", 1 month ago";
@@ -422,7 +425,7 @@ function getHowLongAgoFromIntent(dateo) {
 		
 		//more than 1 year
 		else if (howLongY >= 2){
-			howLong = howLongY + " years";
+			howLong = "about " + howLongY + " years";
 			
 			if (howLongM == 1){
 				howLong = howLong + ", 1 month ago";
