@@ -100,16 +100,9 @@ function handleWelcomeRequest(response) {
 }
 
 function handleHelpRequest(response) {
-    var repromptText = "Which city would you like tide information for?";
-    var speechOutput = "I can lead you through providing a city and "
-        + "day of the week to get tide information, "
-        + "or you can simply open Tide Pooler and ask a question like, "
-        + "get tide information for Seattle on Saturday. "
-        + "For a list of supported cities, ask what cities are supported. "
-        + "Or you can say exit. "
-        + repromptText;
-
-    response.ask(speechOutput, repromptText);
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say something like, Alexa, tell " + skillName + " I cleaned the toilet today."
+		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
+    response.tellWithCard(speechOut, skillName, speechOut)
 }
 
 
@@ -126,7 +119,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         repromptText,
         speechOutput;
     if (choreOut.error) {
-        repromptText = "I couldn't understand that" + choreOrTask + ". Please try again.";
+        repromptText = "I didn't understand that " + choreOrTask + " name. Please try again.";
         speechOutput = repromptText;
 
         response.ask(speechOutput, repromptText);
@@ -135,20 +128,21 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 
     var date = getDateFromIntent(intent.slots.Date.value);
-	if (!date) {
-        repromptText = "Please try again by saying any date like today, or Sunday, or November tenth twenty fifteen.";
-        speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
+	if (date.error) {
+        repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
+        speechOutput = "I didn't understand that date. " + repromptText;
 
         response.ask(speechOutput, repromptText);
-        return;
+		return;
     }
 	
 	
 	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
-	if (!howLong) {
+	//this should never be called since it should stop at date... putting it here just in case??
+	if (howLong.error) {
 
-        repromptText = "Please try again by saying any date like today, or Sunday, or November tenth twenty fifteen.";
-        speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
+        repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
+        speechOutput = "I didn't understand that date. " + repromptText;
 
         response.ask(speechOutput, repromptText);
 
@@ -181,8 +175,9 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				speechOut = "The chore you did was " + choreName + ". It was " + howLongStr + ". You did it on " + dateDisplay + ".";
-				response.tellWithCard(speechOut, "Chore Tracker", speechOut)
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + ".";
+				//speechOut = "The " + date + "_______________" + dateDisplay;
+				response.tellWithCard(speechOut, skillName, speechOut)
 
             }
 	);
@@ -241,7 +236,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 				speechOut = speechOut + getHowLongAgoFromIntent(currentChoreDate).displayLong + ", on " + getDateFromIntent(currentChoreDate).displayDate + ".";
             }
 
-			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
+			response.tellWithCard(speechOut, skillName, speechOut)
 				
     });
 
@@ -280,7 +275,7 @@ function handleDeleteDB(intent, session, response) {
 				
     });
 	*/
-	response.tellWithCard(speechOut, "Chore Tracker", speechOut)
+	response.tellWithCard(speechOut, skillName, speechOut)
  
 }
 
@@ -325,19 +320,20 @@ function getChoreFromIntent(intent, assignDefault) {
  */
 function getDateFromIntent(dateo) {
 
-    var dateSlot = dateo;
+	var date = new Date(dateo);
     
-/*	// slots can be missing, or slots can be provided but with empty value.
+	// slots can be missing, or slots can be provided but with empty value.
     // must test for both.
-    if (!dateSlot || !dateSlot.value) {
+	//no date passed
+    if (!dateo) {
         // default to today
         return {
-            displayDate: "Today default",
-            requestDateParam: "date=today"
+            error: true,
+			displayDate: "foop"
         }
     } else {
-*/
-        var date = new Date(dateSlot);
+
+        
 
         // format the request date like YYYYMMDD
         var month = (date.getMonth() + 1);
@@ -349,9 +345,10 @@ function getDateFromIntent(dateo) {
 
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
-            requestDateParam: requestDay
+            requestDateParam: requestDay,
+			error: false
         }
-    //}
+    }
 }
 
 /**
@@ -363,28 +360,24 @@ function getDateFromIntent(dateo) {
 //function getHowLongAgoFromIntent(intent) {
 function getHowLongAgoFromIntent(dateo) {
 
-    //var dateSlot = intent.slots.Date;
-    var dateSlot = dateo;
-	
+
+	var today = new Date();
+    var date = new Date(dateo);
 	
 	
     // slots can be missing, or slots can be provided but with empty value.
     // must test for both.
-  /*  if (!dateSlot || !dateSlot.value) {
+    if (!dateo) {
         // default to today
         return {
-            displayLong: "Just Now",
+            error: true,
+			displayLong: "GOOPGOOP"
         }
     } else { 
-*/
+
+		
 		var howLong = "please catch edge case";
-		
-		var today = new Date();
-		
-        //var date = new Date(dateSlot.value);
-        var date = new Date(dateSlot);
-		
-		
+
 //actual algo should be implemented at
 // http://www.htmlgoodies.com/html5/javascript/calculating-the-difference-between-two-dates-in-javascript.html
 
@@ -479,9 +472,10 @@ function getHowLongAgoFromIntent(dateo) {
 		}
 		
         return {
-            displayLong: howLong
+            displayLong: howLong,
+			error: false
         }
-    //}
+    }
 }
 
 
