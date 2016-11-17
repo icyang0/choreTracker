@@ -122,12 +122,11 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	var speechOut;
 	
 	// Determine chore, using default if none provided
-    var choreOut = getChoreFromIntent(intent, true),
+    var choreOut = getChoreFromIntent(intent, false),
         repromptText,
         speechOutput;
     if (choreOut.error) {
-        // invalid city. move to the dialog
-        repromptText = "I couldn't parse that " + choreOrTask + ". Please try again.";
+        repromptText = "I couldn't understand that" + choreOrTask + ". Please try again.";
         speechOutput = repromptText;
 
         response.ask(speechOutput, repromptText);
@@ -137,7 +136,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (!date) {
-        repromptText = "Please try again by saying any date like today, or Sunday or November tenth twenty fifteen.";
+        repromptText = "Please try again by saying any date like today, or Sunday, or November tenth twenty fifteen.";
         speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
 
         response.ask(speechOutput, repromptText);
@@ -147,12 +146,12 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
 	if (!howLong) {
-        // Invalid date. set city in session and prompt for date
-        session.attributes.city = cityStation;
-        repromptText = "Please try again saying a day of the week, for example, Saturday. ";
+
+        repromptText = "Please try again by saying any date like today, or Sunday, or November tenth twenty fifteen.";
         speechOutput = "I'm sorry, I didn't understand that date. " + repromptText;
 
         response.ask(speechOutput, repromptText);
+
         return;
     }
 	
