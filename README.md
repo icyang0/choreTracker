@@ -1,6 +1,7 @@
 #todo
 
 1. handle future dates
+1. handle weird date requests, like last weekend, or this week, or this month or next year, or this decade, or next winter.
 2. add better handling of chore inputs????
 3. renove "-ed" (plus any extra doubled consotants... eg bagged) from the input chore
 

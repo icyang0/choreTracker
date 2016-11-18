@@ -338,18 +338,13 @@ function getDateFromIntent(dateo) {
 
 	var date = new Date(dateo);
     
-	// slots can be missing, or slots can be provided but with empty value.
-    // must test for both.
 	//no date passed
     if (!dateo) {
-        // default to today
         return {
             error: true,
 			displayDate: "foop"
         }
     } else {
-
-        
 
         // format the request date like YYYYMMDD
         var month = (date.getMonth() + 1);
@@ -360,7 +355,8 @@ function getDateFromIntent(dateo) {
         var requestDay = "" + date.getFullYear() + month + dayOfMonth;
 
         return {
-            displayDate: alexaDateUtil.getFormattedDate(date),
+            //displayDate: alexaDateUtil.getFormattedDate(date),
+            displayDate: requestDay,
             requestDateParam: requestDay,
 			error: false
         }
@@ -392,6 +388,7 @@ function getHowLongAgoFromIntent(dateo) {
 
 		
 		var howLong = "please catch edge case";
+		var futureError = false;
 
 //actual algo should be implemented at
 // http://www.htmlgoodies.com/html5/javascript/calculating-the-difference-between-two-dates-in-javascript.html
@@ -449,7 +446,7 @@ function getHowLongAgoFromIntent(dateo) {
 			
 		} 
 		//less than one year.. we will not report the year
-		else {
+		else if (howLongY == 0){
 			
 			//one month
 			if (howLongM == 1){
@@ -484,6 +481,10 @@ function getHowLongAgoFromIntent(dateo) {
 				}
 			}
 				
+		} 
+		//if negative years (in the future)
+		else {
+			//WRITE SOMETHING HERE
 		}
 		
         return {
