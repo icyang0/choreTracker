@@ -24,9 +24,15 @@
       ]
     },
     {
-      "intent": "DeleteChoreIntent"
+      "intent": "DeleteChoreIntent",
+	  "slots": [
+        {
+          "name": "ChoreName",
+          "type": "LIST_OF_CHORES"
+        }
+      ]
     },
-	    {
+	{
       "intent": "DeleteDBIntent"
     },
 	

@@ -21,6 +21,38 @@ TellChoreTimeIntent when was the last time that I {ChoreName}
 TellChoreTimeIntent when was the last time I {ChoreName}
 TellChoreTimeIntent when did I last {ChoreName}
 
+
+
+DeleteDBIntent delete everything
+DeleteDBIntent delete all
+DeleteDBIntent delete all of the tasks
+DeleteDBIntent delete all of the task
+DeleteDBIntent delete every task
+DeleteDBIntent delete every tasks
+DeleteDBIntent delete all task
+DeleteDBIntent delete all tasks
+DeleteDBIntent remove every task
+DeleteDBIntent remove every tasks
+DeleteDBIntent remove all task
+DeleteDBIntent remove all tasks
+DeleteDBIntent remove everything
+DeleteDBIntent remove all
+DeleteDBIntent delete everything
+DeleteDBIntent delete all
+DeleteDBIntent delete all of the chores
+DeleteDBIntent delete all of the chore
+DeleteDBIntent delete every chore
+DeleteDBIntent delete every chores
+DeleteDBIntent delete all chore
+DeleteDBIntent delete all chores
+DeleteDBIntent remove every chore
+DeleteDBIntent remove every chores
+DeleteDBIntent remove all chore
+DeleteDBIntent remove all chores
+DeleteDBIntent remove everything
+DeleteDBIntent remove all
+
+
 DeleteChoreIntent delete {ChoreName}
 DeleteChoreIntent remove {ChoreName}
 DeleteChoreIntent forget {ChoreName}

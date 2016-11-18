@@ -68,11 +68,11 @@ TidePooler.prototype.intentHandlers = {
     },
 	
 	"DeleteChoreIntent": function (intent, session, response) {
-        //handleTellChoreTimeRequest(intent, session, response);
+        handleDeleteChoreIntent(intent, session, response);
     },
 	
 	"DeleteDBIntent": function (intent, session, response) {
-        handleDeleteDB(intent, session, response);
+        //handleDeleteDB(intent, session, response);
     },
 
     "AMAZON.HelpIntent": function (intent, session, response) {
@@ -114,7 +114,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 	var speechOut;
 	
-	// Determine chore, using default if none provided
+	// Determine chore
     var choreOut = getChoreFromIntent(intent, false),
         repromptText,
         speechOutput;
@@ -176,7 +176,6 @@ function handleAddChoreTimeRequest(intent, session, response) {
                     console.log(data);
                 }
 				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + ".";
-				//speechOut = "The " + date + "_______________" + dateDisplay;
 				response.tellWithCard(speechOut, skillName, speechOut)
 
             }
@@ -229,8 +228,10 @@ function handleTellChoreTimeRequest(intent, session, response) {
             var currentChore;
             if (err) {
                 speechOut = "ERROR OF SOME SORT";
+			
+			//if we couldsnt find the thingey
             } else if (data.Item === undefined) {
-                speechOut = "NO ITEM";
+                speechOut = "I don't have data about when you "+ choreName + ". Please try again.";
             } else {
                 currentChoreDate = data.Item.DateOfChore.S;
 				speechOut = speechOut + getHowLongAgoFromIntent(currentChoreDate).displayLong + ", on " + getDateFromIntent(currentChoreDate).displayDate + ".";
@@ -250,32 +251,62 @@ function handleTellChoreTimeRequest(intent, session, response) {
  ****************************************************************************
  ********************************fix MEEEEEE!!!!!!!!!!!!!********************************************
  */
-function handleDeleteDB(intent, session, response) {
+function handleDeleteChoreIntent(intent, session, response) {
 	var speechOut = "deleting"
-	/*storage.newChore(session).save(function () {
-            response.tellWithCard(speechOut, "Chore Tracker", speechOut);
-    });*/
-	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
-	/*dynamodb.DeleteItem({
+	// Determine chore, using default if none provided
+    var choreOut = getChoreFromIntent(intent, false),
+        repromptText,
+        speechOutput;
+	//if couldnt understand the chore	
+    if (choreOut.error) {
+        // invalid city. move to the dialog
+        repromptText = "I couldn't understand that " + choreOrTask + ". Please try again.";
+        speechOutput = repromptText;
+
+        response.ask(speechOutput, repromptText);
+        return;
+    }
+	var date;
+	
+	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+	var choreName = choreOut.chore;
+	
+	
+	
+	
+	dynamodb.deleteItem({
         TableName: "ChoreAppDataTable",
+		
             Key: {
                 CustomerId: {
                     S: session.user.userId
-                }
-			}
+                },
+				ChoreName: {
+					S: choreName
+					
+				}
+				
+			},
+			ConditionExpression: "attribute_exists(DateOfChore)"
         }, function (err, data) {
-            if (err) {
-                speechOut = "ERROR OF SOME SORT";
+            var currentChore;
+            
+			//if you were unabe to delete because the item never existed in the first place
+			if (err) {
+				speechOut = "I don't have data about when you "+ choreName + ". Please try again.";
+			
+			//successfully deleted
             } else {
-				speechOut = "Okay, I deleted all of your stored chores";
+                
+				speechOut = "Removed records of when you " + choreName + ".";
             }
 
-			response.tellWithCard(speechOut, "Chore Tracker", speechOut)
+			response.tellWithCard(speechOut, skillName, speechOut)
 				
     });
-	*/
-	response.tellWithCard(speechOut, skillName, speechOut)
+	
+	
  
 }
 
@@ -357,7 +388,6 @@ function getDateFromIntent(dateo) {
  ****************************************************************************
  ****************************************************************************
  */
-//function getHowLongAgoFromIntent(intent) {
 function getHowLongAgoFromIntent(dateo) {
 
 
@@ -478,15 +508,6 @@ function getHowLongAgoFromIntent(dateo) {
     }
 }
 
-
-function getAllStationsText() {
-    var stationList = '';
-    for (var station in STATIONS) {
-        stationList += station + ", ";
-    }
-
-    return stationList;
-}
 
 // Create the handler that responds to the Alexa Request.
 exports.handler = function (event, context) {
