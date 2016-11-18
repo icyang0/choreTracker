@@ -1,9 +1,13 @@
 #todo
 
 1. handle future dates
+2. handle dates without a year??? outputs something but its incorrect
+2. handle non-correct dates, like may 35th or something
 1. handle weird date requests, like last weekend, or this week, or this month or next year, or this decade, or next winter.
 2. add better handling of chore inputs????
 3. renove "-ed" (plus any extra doubled consotants... eg bagged) from the input chore
+
+4. try and better do the time elasped appx
 
 4. add recall #x tasks added
 5. delete all tasks

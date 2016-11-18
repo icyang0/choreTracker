@@ -115,6 +115,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         repromptText,
         speechOutput;
     if (choreOut.error) {
+		
         repromptText = "I didn't understand that " + choreOrTask + " name. Please try again.";
         speechOutput = repromptText;
 
@@ -125,9 +126,10 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//determine date
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (date.error) {
-        repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
-        speechOutput = "I didn't understand that date. " + repromptText;
-
+        speechOutput = "I didn't understand that date. ";
+		repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
+		
+        speechOutput = speechOutput + repromptText;
         response.ask(speechOutput, repromptText);
 		return;
     }
@@ -136,14 +138,23 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
 	//this should never be called since it should stop at date... putting it here just in case??
 	if (howLong.error) {
-
+		
+		speechOutput = "I didn't understand that date. ";
         repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
-        speechOutput = "I didn't understand that date. " + repromptText;
-
+		
+		speechOutput = speechOutput + repromptText;
         response.ask(speechOutput, repromptText);
 
         return;
-    }
+	//if the person inputter a date more than a year in the future
+    } else if (howLong.fError) {
+		
+        speechOutput = "The date you input is in the future. ";
+		repromptText = "Please try again using a date today or earlier.";
+		
+		speechOutput = speechOutput + repromptText;
+		response.ask(speechOutput, repromptText);
+	}
 	
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
@@ -173,13 +184,9 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 }
 				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + ".";
 				response.tellWithCard(speechOut, skillName, speechOut)
-
             }
 	);
-	
-	
 }
-
 
 /**
  * This handles telling the time of a chore
@@ -355,8 +362,7 @@ function getDateFromIntent(dateo) {
         var requestDay = "" + date.getFullYear() + month + dayOfMonth;
 
         return {
-            //displayDate: alexaDateUtil.getFormattedDate(date),
-            displayDate: requestDay,
+            displayDate: alexaDateUtil.getFormattedDate(date),
             requestDateParam: requestDay,
 			error: false
         }
@@ -371,10 +377,8 @@ function getDateFromIntent(dateo) {
  */
 function getHowLongAgoFromIntent(dateo) {
 
-
 	var today = new Date();
     var date = new Date(dateo);
-	
 	
     // slots can be missing, or slots can be provided but with empty value.
     // must test for both.
@@ -484,12 +488,13 @@ function getHowLongAgoFromIntent(dateo) {
 		} 
 		//if negative years (in the future)
 		else {
-			//WRITE SOMETHING HERE
+			futureError = true;
 		}
 		
         return {
             displayLong: howLong,
-			error: false
+			error: false,
+			fError: futureError
         }
     }
 }
