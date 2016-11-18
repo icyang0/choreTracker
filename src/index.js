@@ -91,8 +91,6 @@ TidePooler.prototype.intentHandlers = {
 };
 
 
-
-
 function handleWelcomeRequest(response) {
 	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say something like, Alexa, tell " + skillName + " I cleaned the toilet today."
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
@@ -104,8 +102,6 @@ function handleHelpRequest(response) {
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
     response.tellWithCard(speechOut, skillName, speechOut)
 }
-
-
 
 /**
  * This handles adding a chore
@@ -126,7 +122,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         return;
     }
 	
-
+	//determine date
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (date.error) {
         repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
@@ -136,7 +132,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		return;
     }
 	
-	
+	//determine how long ago date was from today
 	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
 	//this should never be called since it should stop at date... putting it here just in case??
 	if (howLong.error) {
@@ -183,7 +179,6 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 	
 }
-
 
 
 /**
@@ -244,12 +239,8 @@ function handleTellChoreTimeRequest(intent, session, response) {
  
 }
 
-
 /**
- * This handles deleting the entire DB for a Customer
- ****************************************************************************
- ****************************************************************************
- ********************************fix MEEEEEE!!!!!!!!!!!!!********************************************
+ * This handles deleting a specific chore for a Customer
  */
 function handleDeleteChoreIntent(intent, session, response) {
 	var speechOut = "deleting"
@@ -272,9 +263,6 @@ function handleDeleteChoreIntent(intent, session, response) {
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 	var choreName = choreOut.chore;
 	
-	
-	
-	
 	dynamodb.deleteItem({
         TableName: "ChoreAppDataTable",
 		
@@ -284,15 +272,13 @@ function handleDeleteChoreIntent(intent, session, response) {
                 },
 				ChoreName: {
 					S: choreName
-					
 				}
-				
 			},
 			ConditionExpression: "attribute_exists(DateOfChore)"
         }, function (err, data) {
             var currentChore;
             
-			//if you were unabe to delete because the item never existed in the first place
+			//if you were unable to delete because the item never existed in the first place
 			if (err) {
 				speechOut = "I don't have data about when you "+ choreName + ". Please try again.";
 			
@@ -327,7 +313,7 @@ function getChoreFromIntent(intent, assignDefault) {
                 error: true
             }
         } else {
-            // so if we want to default to something, default to pooping
+            // if we decide we want to default to some chore. (shouldnt ever call this)
             return {
                 chore: "pooped"
             }
@@ -340,7 +326,6 @@ function getChoreFromIntent(intent, assignDefault) {
 		}
     }
 }
-
 
 /**
  * Gets the date from the intent, defaulting to today if none provided,
@@ -508,6 +493,10 @@ function getHowLongAgoFromIntent(dateo) {
     }
 }
 
+
+function checkSimilarChoreName(dateo){
+	
+}
 
 // Create the handler that responds to the Alexa Request.
 exports.handler = function (event, context) {
