@@ -182,7 +182,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + ".";
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
+//				+ howLong.displayLongY + " years, " + howLong.displayLongM + " months, " + howLong.displayLongD + " days, "  ;
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
 	);
@@ -353,17 +354,8 @@ function getDateFromIntent(dateo) {
         }
     } else {
 
-        // format the request date like YYYYMMDD
-        var month = (date.getMonth() + 1);
-        month = month < 10 ? '0' + month : month;
-        var dayOfMonth = date.getDate();
-        dayOfMonth = dayOfMonth < 10 ? '0' + dayOfMonth : dayOfMonth;
-        //var requestDay = "begin_date=" + date.getFullYear() + month + dayOfMonth + "&range=24";
-        var requestDay = "" + date.getFullYear() + month + dayOfMonth;
-
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
-            requestDateParam: requestDay,
 			error: false
         }
     }
@@ -393,6 +385,14 @@ function getHowLongAgoFromIntent(dateo) {
 		
 		var howLong = "please catch edge case";
 		var futureError = false;
+		
+		if (today - date < 0){
+			futureError = true;
+		}
+		
+		//Get 1 day in milliseconds
+		var one_day=1000*60*60*24;
+
 
 //actual algo should be implemented at
 // http://www.htmlgoodies.com/html5/javascript/calculating-the-difference-between-two-dates-in-javascript.html
@@ -473,16 +473,24 @@ function getHowLongAgoFromIntent(dateo) {
 				} 
 				
 			//less than one month, report days only.
-			} else {
-				howLongD = today.getDay() - date.getDay();
+			} else if (howLongM >= 0) {
+				howLongD = today.getDate() - date.getDate();
 				if (howLongD == 1){
 					howLong = "1 day ago";
 				} else if (howLongD == 0){
-					howLong = "today"
+					howLong = "today";
 					
-				} else {
+				} else if (howLongD > 1){
 					howLong = howLongD + " days ago";
 				}
+				//if negative days (in the future)
+				else {
+					futureError = true;
+				}
+			}
+			//if negative months (in the future)
+			else {
+				futureError = true;
 			}
 				
 		} 
