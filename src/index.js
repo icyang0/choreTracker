@@ -119,8 +119,11 @@ function handleAddChoreTimeRequest(intent, session, response) {
         repromptText = "I didn't understand that " + choreOrTask + " name. Please try again.";
         speechOutput = repromptText;
 
-        response.ask(speechOutput, repromptText);
-        return;
+        //response.ask(speechOutput, repromptText);
+        response.tellWithCard(speechOutput, skillName, speechOutput)
+		
+		
+		return;
     }
 	
 	//determine date
@@ -130,7 +133,9 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
 		
         speechOutput = speechOutput + repromptText;
-        response.ask(speechOutput, repromptText);
+        //response.ask(speechOutput, repromptText);
+		
+		response.tellWithCard(speechOutput, skillName, speechOutput)
 		return;
     }
 	
@@ -143,7 +148,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
         repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
 		
 		speechOutput = speechOutput + repromptText;
-        response.ask(speechOutput, repromptText);
+        //response.ask(speechOutput, repromptText);
+		response.tellWithCard(speechOutput, skillName, speechOutput)
 
         return;
 	//if the person inputter a date more than a year in the future
@@ -153,7 +159,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
-		response.ask(speechOutput, repromptText);
+		//response.ask(speechOutput, repromptText);
+		response.tellWithCard(speechOutput, skillName, speechOutput)
 	}
 	
 	
@@ -207,7 +214,8 @@ function handleTellChoreTimeRequest(intent, session, response) {
         repromptText = "I couldn't understand that " + choreOrTask + ". Please try again.";
         speechOutput = repromptText;
 
-        response.ask(speechOutput, repromptText);
+        //response.ask(speechOutput, repromptText);
+		response.tellWithCard(speechOutput, skillName, speechOutput)
         return;
     }
 	var date;

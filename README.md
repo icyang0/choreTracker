@@ -1,6 +1,7 @@
 #todo
 
-1. handle future dates
+1. oh god the app doesnt get the chore names at all T_T;;;
+1. IMPLEMENT ALL REPROMPTS CORRECTLY
 2. handle dates without a year??? outputs something but its incorrect
 2. handle non-correct dates, like may 35th or something
 1. handle weird date requests, like last weekend, or this week, or this month or next year, or this decade, or next winter.
@@ -42,4 +43,4 @@ ADD CODE TO REPRESENT TODAY AS HOW LONG AGO
 2. format date output to user3. fix DB storage method?? (seperate items?)
 delete whichever specific chore
 7. remove extraneous code
-
+1. handle future dates
