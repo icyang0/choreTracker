@@ -1,11 +1,12 @@
 
 
-AddChoreTimeIntent tell that {Date} I {ChoreName}
-AddChoreTimeIntent tell to remember that {Date} I {ChoreName}
-AddChoreTimeIntent tell that I {ChoreName} {Date}
-AddChoreTimeIntent tell that I {ChoreName} on {Date}
-AddChoreTimeIntent tell to remember that I {ChoreName} {Date}
-AddChoreTimeIntent tell to remember that I {ChoreName} on {Date}
+AddChoreTimeIntent {Date} I {ChoreName}
+AddChoreTimeIntent that {Date} I {ChoreName}
+AddChoreTimeIntent to remember that {Date} I {ChoreName}
+AddChoreTimeIntent that I {ChoreName} {Date}
+AddChoreTimeIntent that I {ChoreName} on {Date}
+AddChoreTimeIntent to remember that I {ChoreName} {Date}
+AddChoreTimeIntent to remember that I {ChoreName} on {Date}
 
 TellChoreTimeIntent remind me the last time that I {ChoreName}
 TellChoreTimeIntent remind me the last time I {ChoreName}

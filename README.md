@@ -1,12 +1,20 @@
 #todo
 
+1. 3. renove "-ed" (plus any extra doubled consotants... eg bagged) from the input chore
+1a. if peed, then only remove the d
+
+?? implement a {verb} {noun} interaction model
+	would that mean i need to save a list of all verbs?
+
+use a batch get to look through the database, instead of pulling each one individually
+
+
 1. oh god the app doesnt get the chore names at all T_T;;;
 1. IMPLEMENT ALL REPROMPTS CORRECTLY
 2. handle dates without a year??? outputs something but its incorrect
 2. handle non-correct dates, like may 35th or something
 1. handle weird date requests, like last weekend, or this week, or this month or next year, or this decade, or next winter.
 2. add better handling of chore inputs????
-3. renove "-ed" (plus any extra doubled consotants... eg bagged) from the input chore
 
 4. try and better do the time elasped appx
 
