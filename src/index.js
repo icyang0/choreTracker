@@ -7,7 +7,8 @@ var skillName = "Chore Tracker";
 var choreOrTask = "chore";
 
 'use strict';
-var storage = require('./storage');
+require('./date');
+var nlp = require('./nlp_compromise');
 
 var http = require('http'),
     alexaDateUtil = require('./alexaDateUtil');
@@ -103,6 +104,9 @@ function handleHelpRequest(response) {
     response.tellWithCard(speechOut, skillName, speechOut)
 }
 
+
+
+
 /**
  * This handles adding a chore
  */
@@ -155,19 +159,26 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
-        speechOutput = "Adding. The date you input is in the future. ";
+  /*      speechOutput = "Adding. The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
 		//response.ask(speechOutput, repromptText);
 		response.tellWithCard(speechOutput, skillName, speechOutput)
+		
+		return;
+		
+		*/
 	}
 	
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-	var choreName = choreOut.chore;
+	var chore = choreOut.chore;
+	var chorePast = nlp.sentence(chore).to_past().text();
 	var howLongStr = howLong.displayLong;
 	var dateDisplay = date.displayDate;
+	var test = "poop";
+	var test = Date.parse(intent.slots.Date.value);
 	
 	dynamodb.putItem({
                 TableName: "ChoreAppDataTable",
@@ -176,7 +187,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
                         S: session.user.userId
                     },
 					ChoreName: {
-						S: choreName
+						S: chorePast
 					},
 					DateOfChore: {
 						S: intent.slots.Date.value
@@ -189,8 +200,10 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
-//				+ howLong.displayLongY + " years, " + howLong.displayLongM + " months, " + howLong.displayLongD + " days, "  ;
+				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
+				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + test + "." ;
+				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
+
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
 	);
@@ -222,8 +235,9 @@ function handleTellChoreTimeRequest(intent, session, response) {
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 	var choreName = choreOut.chore;
+	var chorePast = nlp.sentence(choreName).to_past().text();
 	
-	speechOut = "The last time you " + choreOut.chore + " was ";
+	speechOut = "The last time you " + chorePast + " was ";
 	
 	dynamodb.getItem({
         TableName: "ChoreAppDataTable",
@@ -232,7 +246,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
                     S: session.user.userId
                 },
 				ChoreName: {
-					S: choreName
+					S: chorePast
 				}
 			}
         }, function (err, data) {
@@ -242,7 +256,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 			
 			//if we couldsnt find the thingey
             } else if (data.Item === undefined) {
-                speechOut = "Lookup. I don't have data about when you "+ choreName + ". Please try again.";
+                speechOut = "Lookup. I don't have data about when you "+ chorePast + ". Please try again.";
             } else {
                 currentChoreDate = data.Item.DateOfChore.S;
 				speechOut = speechOut + getHowLongAgoFromIntent(currentChoreDate).displayLong + ", on " + getDateFromIntent(currentChoreDate).displayDate + ".";
@@ -278,6 +292,7 @@ function handleDeleteChoreIntent(intent, session, response) {
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 	var choreName = choreOut.chore;
+	var chorePast = nlp.sentence(choreName).to_past().text();
 	
 	dynamodb.deleteItem({
         TableName: "ChoreAppDataTable",
@@ -287,7 +302,7 @@ function handleDeleteChoreIntent(intent, session, response) {
                     S: session.user.userId
                 },
 				ChoreName: {
-					S: choreName
+					S: chorePast
 				}
 			},
 			ConditionExpression: "attribute_exists(DateOfChore)"
@@ -296,12 +311,12 @@ function handleDeleteChoreIntent(intent, session, response) {
             
 			//if you were unable to delete because the item never existed in the first place
 			if (err) {
-				speechOut = "Deleting. I don't have data about when you "+ choreName + ". Please try again.";
+				speechOut = "Deleting. I don't have data about when you "+ chorePast + ". Please try again.";
 			
 			//successfully deleted
             } else {
                 
-				speechOut = "Removed records of when you " + choreName + ".";
+				speechOut = "Removed records of when you " + chorePast + ".";
             }
 
 			response.tellWithCard(speechOut, skillName, speechOut)
@@ -331,7 +346,7 @@ function getChoreFromIntent(intent, assignDefault) {
         } else {
             // if we decide we want to default to some chore. (shouldnt ever call this)
             return {
-                chore: "pooped"
+                chore: "default task"
             }
         }
     } else {
@@ -358,12 +373,13 @@ function getDateFromIntent(dateo) {
     if (!dateo) {
         return {
             error: true,
-			displayDate: "foop"
+			displayDate: "default date"
         }
     } else {
 
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
+            //displayDate: date,
 			error: false
         }
     }
@@ -386,7 +402,7 @@ function getHowLongAgoFromIntent(dateo) {
         // default to today
         return {
             error: true,
-			displayLong: "GOOPGOOP"
+			displayLong: "default how long"
         }
     } else { 
 
