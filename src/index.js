@@ -15,6 +15,9 @@ var http = require('http'),
 	
 var AWS = require("aws-sdk");
 
+var SATURDAY = 6,
+	SUNDAY = 0;
+
 /**
  * The AlexaSkill prototype and helper functions
  */
@@ -178,7 +181,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	var howLongStr = howLong.displayLong;
 	var dateDisplay = date.displayDate;
 	var test = "poop";
-	var test = Date.parse(intent.slots.Date.value);
+	var test = Date.parse(date.origDate);
 	
 	dynamodb.putItem({
                 TableName: "ChoreAppDataTable",
@@ -201,8 +204,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                     console.log(data);
                 }
 				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
-				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + test + "." ;
-				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
+				speechOut = "Okay. You " + chorePast + " " + date.origDate + ", on " + date.poop + "." + dateDisplay;
+				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
 
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
@@ -367,8 +370,11 @@ function getChoreFromIntent(intent, assignDefault) {
  */
 function getDateFromIntent(dateo) {
 
-	var date = new Date(dateo);
-    
+	var date = new Date();
+	//var date = new Date(dateo);
+    var week = 0;
+	var day = 0;
+	
 	//no date passed
     if (!dateo) {
         return {
@@ -376,10 +382,33 @@ function getDateFromIntent(dateo) {
 			displayDate: "default date"
         }
     } else {
+		
+		//if passed a 'week' or 'weekend'
+		if (dateo[5] == "W") {
 
+			week = dateo.substring(6,8);
+			date = Date.january();
+			date = date.addWeeks(week - 1);
+			day = date.getDay;
+			
+			//if passed a 'weekend' only
+			if (dateo[9] == "W") {
+				//check to see if the parsed day is a weekday.. add days until it gets to the weekend
+				for ((day != SUNDAY) && (day != SATURDAY)) {
+					date = date.addDays(6 - SATURDAY); 
+				}
+				
+			}
+			
+			
+		} else {
+			date = new Date(dateo);
+		}
+		
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
-            //displayDate: date,
+            origDate: dateo,
+			poop: week,
 			error: false
         }
     }
