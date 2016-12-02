@@ -1,13 +1,12 @@
 #todo
 
-1. NEED TO TAG VERBS IN THE SENTENC...????
-"clean" vs "cleaned" is not consistant
 1. "this week" date is off by a week... need to fix :(, but technically works
+1. fix the interaction model
+1. maybe i should just strip out all adverbs????
 
 1. IMPLEMENT ALL REPROMPTS CORRECTLY
 2. handle dates without a year??? outputs something but its incorrect
 2. handle non-correct dates, like may 35th or something
-1. handle weird date requests, like last weekend, or this week, or this month or next year, or this decade, or next winter.
 
 4. try and better do the time elasped appx
 
@@ -47,4 +46,4 @@ ADD CODE TO REPRESENT TODAY AS HOW LONG AGO
 delete whichever specific chore
 7. remove extraneous code
 1. handle future dates
-2. handles making msot things past tense
+2. handles stripping out adverbs, and saving verbs as past tense... not thuroughly tested, but good enough??

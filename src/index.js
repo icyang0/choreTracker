@@ -175,8 +175,30 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-	var chore = choreOut.chore;
-	var chorePast = nlp.sentence(chore).to_past().text();
+	var choreName = choreOut.chore;
+	
+	var choreSplit = choreName.split(' ');
+	
+	var tag;
+	//find index of verb
+	var INDEX_OF_VERB = -1;
+	
+	do {
+		INDEX_OF_VERB = INDEX_OF_VERB + 1;
+		tag = nlp.sentence(choreName).tags()[INDEX_OF_VERB];
+	} while (tag == "Adverb");
+	
+	//make the verb (assumed to be after all preceding adverbs), into past tense
+	var choreVerb = choreSplit[INDEX_OF_VERB];
+	choreVerb = nlp.verb(choreVerb).to_past();
+	choreSplit[INDEX_OF_VERB] = choreVerb;
+	
+	//reassemble the chroe Name, with new past tense verb
+	var chorePast = choreSplit.join();
+	chorePast = chorePast.replace(/,/g, " ");
+	
+	//chorePast = nlp.sentence("quickly and cleanly clean the car").tags();
+	
 	var howLongStr = howLong.displayLong;
 	var dateDisplay = date.displayDate;
 	
