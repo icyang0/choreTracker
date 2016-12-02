@@ -222,8 +222,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
-				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
+				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
+				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
 				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
