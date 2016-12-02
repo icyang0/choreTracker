@@ -394,7 +394,7 @@ function getDateFromIntent(dateo) {
 			//if passed a 'weekend' only
 			if (dateo[9] == "W") {
 				//check to see if the parsed day is a weekday.. add days until it gets to the weekend
-				for ((day != SUNDAY) && (day != SATURDAY)) {
+				if ((day != SUNDAY) && (day != SATURDAY)) {
 					date = date.addDays(6 - SATURDAY); 
 				}
 				
