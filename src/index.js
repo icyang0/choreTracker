@@ -222,7 +222,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
+				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
+				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
 				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
@@ -413,6 +414,7 @@ function getDateFromIntent(dateo) {
 	var date = new Date();
     var week = 0;
 	var day = 0;
+	var nonStandardDateError = false;
 	
 	//no date passed
     if (!dateo) {
@@ -422,8 +424,17 @@ function getDateFromIntent(dateo) {
         }
     } else {
 		
-		//if passed a 'week' or 'weekend'
-		if (dateo[5] == "W") {
+		var season = dateo.substring(5,7);
+		//if a season passed
+		if ((season == "WI") || (season == "SP") || (season == "SU") || (season == "FA")) {
+			nonStandardDateError = true;
+
+		//if passed a decade
+		} else if (dateo[3] == "X") {
+			nonStandardDateError = true;
+		
+		//if passed a 'week' or 'weekend', 
+		} else if (dateo[5] == "W") {
 
 			week = dateo.substring(6,8);
 			date = Date.january();
@@ -437,8 +448,7 @@ function getDateFromIntent(dateo) {
 					date = date.addDays(6 - SATURDAY); 
 				}
 			}
-			
-			
+
 		} else {
 			date = new Date(dateo);
 		}
@@ -447,7 +457,7 @@ function getDateFromIntent(dateo) {
             displayDate: alexaDateUtil.getFormattedDate(date),
             origDate: dateo,
 			formatDate: date.toISOString().substring(0,10),
-			error: false
+			error: nonStandardDateError
         }
     }
 }

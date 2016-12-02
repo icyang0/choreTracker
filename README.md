@@ -2,11 +2,12 @@
 
 1. "this week" date is off by a week... need to fix :(, but technically works
 1. fix the interaction model
-1. maybe i should just strip out all adverbs????
+1. maybe i should just strip out all adverbs???? that would require making 2 diffferent custom slot types.. one of verb and then one of nounnn???????IDK loll, please dont say adverbs.
 
 1. IMPLEMENT ALL REPROMPTS CORRECTLY
 2. handle dates without a year??? outputs something but its incorrect
-2. handle non-correct dates, like may 35th or something
+
+
 
 4. try and better do the time elasped appx
 
@@ -47,3 +48,7 @@ delete whichever specific chore
 7. remove extraneous code
 1. handle future dates
 2. handles stripping out adverbs, and saving verbs as past tense... not thuroughly tested, but good enough??
+3. handles incorrect dates (i.e. feb 30th 2016, or may 37th 2011), by defaulting to the 1st day of that year. (amazon date intent already does this by default, i cant change it)
+4. handles "this month" or "this year" correctly.
+2. handle seasonal inputs by retuning error to user
+2. handle decades given by returning error to user
