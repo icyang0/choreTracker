@@ -129,7 +129,6 @@ function handleAddChoreTimeRequest(intent, session, response) {
         //response.ask(speechOutput, repromptText);
         response.tellWithCard(speechOutput, skillName, speechOutput)
 		
-		
 		return;
     }
 	
@@ -147,7 +146,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
     }
 	
 	//determine how long ago date was from today
-	var howLong = getHowLongAgoFromIntent(intent.slots.Date.value);
+	var howLong = getHowLongAgoFromIntent(date.formatDate);
 	//this should never be called since it should stop at date... putting it here just in case??
 	if (howLong.error) {
 		
@@ -162,7 +161,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
-  /*      speechOutput = "Adding. The date you input is in the future. ";
+        speechOutput = "Adding. The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
@@ -171,7 +170,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		
 		return;
 		
-		*/
+		
 	}
 	
 	
@@ -180,8 +179,6 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	var chorePast = nlp.sentence(chore).to_past().text();
 	var howLongStr = howLong.displayLong;
 	var dateDisplay = date.displayDate;
-	var test = "poop";
-	var test = Date.parse(date.origDate);
 	
 	dynamodb.putItem({
                 TableName: "ChoreAppDataTable",
@@ -193,7 +190,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 						S: chorePast
 					},
 					DateOfChore: {
-						S: intent.slots.Date.value
+						S: date.formatDate
 					}
                 }
             }, function (err, data) {
@@ -203,10 +200,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
-				speechOut = "Okay. You " + chorePast + " " + date.origDate + ", on " + date.poop + "." + dateDisplay;
-				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
-
+				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
+				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
 	);
@@ -240,7 +235,9 @@ function handleTellChoreTimeRequest(intent, session, response) {
 	var choreName = choreOut.chore;
 	var chorePast = nlp.sentence(choreName).to_past().text();
 	
-	speechOut = "The last time you " + chorePast + " was ";
+	var date;
+	var howLong;
+
 	
 	dynamodb.getItem({
         TableName: "ChoreAppDataTable",
@@ -262,7 +259,28 @@ function handleTellChoreTimeRequest(intent, session, response) {
                 speechOut = "Lookup. I don't have data about when you "+ chorePast + ". Please try again.";
             } else {
                 currentChoreDate = data.Item.DateOfChore.S;
-				speechOut = speechOut + getHowLongAgoFromIntent(currentChoreDate).displayLong + ", on " + getDateFromIntent(currentChoreDate).displayDate + ".";
+				
+				date = getDateFromIntent(currentChoreDate);
+				if (date.error) {
+					speechOutput = "Something wrong with database date";
+				}
+	
+				//determine how long ago date was from today
+				howLong = getHowLongAgoFromIntent(date.formatDate);
+				//this should never be called since it should stop at date... putting it here just in case??
+				if (howLong.error) {
+		
+					speechOutput = "SOmething wrong with finding how long from database date";
+       
+				//if the person inputter a date more than a year in the future.. shouldnt get to this state
+				} else if (howLong.fError) {
+					speechOutput = "The date from database is in future. ";
+				}
+				
+				howLongStr = howLong.displayLong;
+				dateDisplay = date.displayDate;
+				
+				speechOut = "The last time you " + chorePast + " was " + howLongStr + ", on " + dateDisplay + ".";
             }
 
 			response.tellWithCard(speechOut, skillName, speechOut)
@@ -371,7 +389,6 @@ function getChoreFromIntent(intent, assignDefault) {
 function getDateFromIntent(dateo) {
 
 	var date = new Date();
-	//var date = new Date(dateo);
     var week = 0;
 	var day = 0;
 	
@@ -397,7 +414,6 @@ function getDateFromIntent(dateo) {
 				if ((day != SUNDAY) && (day != SATURDAY)) {
 					date = date.addDays(6 - SATURDAY); 
 				}
-				
 			}
 			
 			
@@ -408,7 +424,7 @@ function getDateFromIntent(dateo) {
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
             origDate: dateo,
-			poop: week,
+			formatDate: date.toISOString().substring(0,10),
 			error: false
         }
     }
@@ -424,6 +440,7 @@ function getHowLongAgoFromIntent(dateo) {
 
 	var today = new Date();
     var date = new Date(dateo);
+ 
 	
     // slots can be missing, or slots can be provided but with empty value.
     // must test for both.
@@ -525,9 +542,11 @@ function getHowLongAgoFromIntent(dateo) {
 					howLong = howLong + ", " + howLongD + " days ago";
 				} 
 				
-			//less than one month, report days only.
+			//less than 30 days ago, report days only.
 			} else if (howLongM >= 0) {
-				howLongD = today.getDate() - date.getDate();
+				
+				howLongD = Math.trunc(((today - date)/86400000));
+				
 				if (howLongD == 1){
 					howLong = "1 day ago";
 				} else if (howLongD == 0){

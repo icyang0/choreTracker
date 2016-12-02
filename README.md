@@ -1,7 +1,7 @@
 #todo
 
 1. NEED TO TAG VERBS IN THE SENTENC...????
-
+1. "this week" date is off by a week... need to fix :(, but technically works
 
 1. IMPLEMENT ALL REPROMPTS CORRECTLY
 2. handle dates without a year??? outputs something but its incorrect
