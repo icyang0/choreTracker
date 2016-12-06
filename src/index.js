@@ -161,14 +161,14 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
-        speechOutput = "Adding. The date you input is in the future. ";
+     /*   speechOutput = "Adding. The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
 		//response.ask(speechOutput, repromptText);
 		response.tellWithCard(speechOutput, skillName, speechOutput)
 		
-		return;
+		return;*/
 		
 		
 	}
@@ -176,28 +176,6 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 	var choreName = choreOut.chore;
-	
-	var choreSplit = choreName.split(' ');
-	
-	var tag;
-	//find index of verb
-	var INDEX_OF_VERB = -1;
-	
-	do {
-		INDEX_OF_VERB = INDEX_OF_VERB + 1;
-		tag = nlp.sentence(choreName).tags()[INDEX_OF_VERB];
-	} while (tag == "Adverb");
-	
-	//make the verb (assumed to be after all preceding adverbs), into past tense
-	var choreVerb = choreSplit[INDEX_OF_VERB];
-	choreVerb = nlp.verb(choreVerb).to_past();
-	choreSplit[INDEX_OF_VERB] = choreVerb;
-	
-	//reassemble the chroe Name, with new past tense verb
-	var chorePast = choreSplit.join();
-	chorePast = chorePast.replace(/,/g, " ");
-	
-	//chorePast = nlp.sentence("quickly and cleanly clean the car").tags();
 	
 	var howLongStr = howLong.displayLong;
 	var dateDisplay = date.displayDate;
@@ -209,7 +187,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
                         S: session.user.userId
                     },
 					ChoreName: {
-						S: chorePast
+						S: choreName
 					},
 					DateOfChore: {
 						S: date.formatDate
@@ -222,8 +200,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + dateDisplay + "." ;
-				//speechOut = "Okay. You " + chorePast + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
+				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
 				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
@@ -256,7 +234,6 @@ function handleTellChoreTimeRequest(intent, session, response) {
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 	var choreName = choreOut.chore;
-	var chorePast = nlp.sentence(choreName).to_past().text();
 	
 	var date;
 	var howLong;
@@ -269,7 +246,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
                     S: session.user.userId
                 },
 				ChoreName: {
-					S: chorePast
+					S: choreName
 				}
 			}
         }, function (err, data) {
@@ -279,7 +256,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 			
 			//if we couldsnt find the thingey
             } else if (data.Item === undefined) {
-                speechOut = "Lookup. I don't have data about when you "+ chorePast + ". Please try again.";
+                speechOut = "Lookup. I don't have data about when you "+ choreName + ". Please try again.";
             } else {
                 currentChoreDate = data.Item.DateOfChore.S;
 				
@@ -303,7 +280,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 				howLongStr = howLong.displayLong;
 				dateDisplay = date.displayDate;
 				
-				speechOut = "The last time you " + chorePast + " was " + howLongStr + ", on " + dateDisplay + ".";
+				speechOut = "The last time you " + choreName + " was " + howLongStr + ", on " + dateDisplay + ".";
             }
 
 			response.tellWithCard(speechOut, skillName, speechOut)
@@ -336,8 +313,7 @@ function handleDeleteChoreIntent(intent, session, response) {
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 	var choreName = choreOut.chore;
-	var chorePast = nlp.sentence(choreName).to_past().text();
-	
+
 	dynamodb.deleteItem({
         TableName: "ChoreAppDataTable",
 		
@@ -346,7 +322,7 @@ function handleDeleteChoreIntent(intent, session, response) {
                     S: session.user.userId
                 },
 				ChoreName: {
-					S: chorePast
+					S: choreName
 				}
 			},
 			ConditionExpression: "attribute_exists(DateOfChore)"
@@ -355,12 +331,12 @@ function handleDeleteChoreIntent(intent, session, response) {
             
 			//if you were unable to delete because the item never existed in the first place
 			if (err) {
-				speechOut = "Deleting. I don't have data about when you "+ chorePast + ". Please try again.";
+				speechOut = "Deleting. I don't have data about when you "+ choreName + ". Please try again.";
 			
 			//successfully deleted
             } else {
                 
-				speechOut = "Removed records of when you " + chorePast + ".";
+				speechOut = "Removed records of when you " + choreName + ".";
             }
 
 			response.tellWithCard(speechOut, skillName, speechOut)
@@ -394,10 +370,45 @@ function getChoreFromIntent(intent, assignDefault) {
             }
         }
     } else {
+		
         var choreName = choreSlot.value;
+		
+		var choreSplit = choreName.split(' ');
+	
+		var currTag;
+		//find index of verb
+		/*var INDEX_OF_VERB = -1;
+		//make sure not to count any adverbs (e.g. chore = "quickly cooking pasta")
+		do {
+			INDEX_OF_VERB = INDEX_OF_VERB + 1;
+			currTag = nlp.sentence(choreName).tags()[INDEX_OF_VERB];
+		} while (currTag == "Adverb");
+		*/
+		
+		var INDEX_OF_VERB = 0;
+		currTag = nlp.sentence(choreName).tags()[INDEX_OF_VERB];
+		
+		while (currTag == "Adverb") {
+			INDEX_OF_VERB = INDEX_OF_VERB + 1;
+			currTag = nlp.sentence(choreName).tags()[INDEX_OF_VERB];
+		}
+	
+		//make the verb (assumed to be after all preceding adverbs), into past tense
+		var choreVerb = choreSplit[INDEX_OF_VERB];
+		choreVerb = nlp.verb(choreVerb).to_past();
+		choreSplit[INDEX_OF_VERB] = choreVerb;
+	
+		//reassemble the chroe Name, with new past tense verb
+		var chorePast = choreSplit.join();
+		chorePast = chorePast.replace(/,/g, " ");
+	
+		//chorePast = nlp.sentence("quickly and cleanly clean the car").tags();
+	
+		//finally, replace any "my" with "the"
+		chorePast = chorePast.replace(/my/gi, "the");
         
         return {
-            chore: choreName
+            chore: chorePast
 		}
     }
 }

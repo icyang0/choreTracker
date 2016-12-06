@@ -1,5 +1,6 @@
 #todo
 
+1. add in handling for day of the week/ "i cleaned on sunday"
 1. "this week" date is off by a week... need to fix :(, but technically works
 1. fix the interaction model
 1. maybe i should just strip out all adverbs???? that would require making 2 diffferent custom slot types.. one of verb and then one of nounnn???????IDK loll, please dont say adverbs.
@@ -52,3 +53,4 @@ delete whichever specific chore
 4. handles "this month" or "this year" correctly.
 2. handle seasonal inputs by retuning error to user
 2. handle decades given by returning error to user
+
