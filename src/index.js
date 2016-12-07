@@ -161,14 +161,14 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
-     /*   speechOutput = "Adding. The date you input is in the future. ";
+        speechOutput = "Adding. The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
 		//response.ask(speechOutput, repromptText);
 		response.tellWithCard(speechOutput, skillName, speechOutput)
 		
-		return;*/
+		return;
 		
 		
 	}
@@ -200,8 +200,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
-				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
+				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
 				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
@@ -223,7 +223,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 	//if couldnt understand the chore	
     if (choreOut.error) {
         // invalid city. move to the dialog
-        repromptText = "Relaying. I couldn't understand that " + choreOrTask + ". Please try again.";
+        repromptText = "I couldn't understand that " + choreOrTask + ". Please try again.";
         speechOutput = repromptText;
 
         //response.ask(speechOutput, repromptText);
@@ -256,7 +256,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 			
 			//if we couldsnt find the thingey
             } else if (data.Item === undefined) {
-                speechOut = "Lookup. I don't have data about when you "+ choreName + ". Please try again.";
+                speechOut = "I don't have data about when you "+ choreName + ". Please try again.";
             } else {
                 currentChoreDate = data.Item.DateOfChore.S;
 				
@@ -270,7 +270,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 				//this should never be called since it should stop at date... putting it here just in case??
 				if (howLong.error) {
 		
-					speechOutput = "SOmething wrong with finding how long from database date";
+					speechOutput = "Something wrong with finding how long from database date";
        
 				//if the person inputter a date more than a year in the future.. shouldnt get to this state
 				} else if (howLong.fError) {
@@ -331,7 +331,7 @@ function handleDeleteChoreIntent(intent, session, response) {
             
 			//if you were unable to delete because the item never existed in the first place
 			if (err) {
-				speechOut = "Deleting. I don't have data about when you "+ choreName + ". Please try again.";
+				speechOut = "I don't have data about when you "+ choreName + ". Please try again.";
 			
 			//successfully deleted
             } else {
