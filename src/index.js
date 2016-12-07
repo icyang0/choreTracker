@@ -123,7 +123,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         speechOutput;
     if (choreOut.error) {
 		
-        repromptText = "Adding. I didn't understand that " + choreOrTask + ". Please try again.";
+        repromptText = "I didn't understand that " + choreOrTask + ". Please try again.";
         speechOutput = repromptText;
 
         //response.ask(speechOutput, repromptText);
@@ -135,7 +135,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//determine date
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (date.error) {
-        speechOutput = "Adding. I didn't understand that date. ";
+        speechOutput = "I didn't understand that date. ";
 		repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
 		
         speechOutput = speechOutput + repromptText;
@@ -150,7 +150,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//this should never be called since it should stop at date... putting it here just in case??
 	if (howLong.error) {
 		
-		speechOutput = "Adding. I didn't understand that date. ";
+		speechOutput = "I didn't understand that date. ";
         repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
 		
 		speechOutput = speechOutput + repromptText;
@@ -161,7 +161,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
-        speechOutput = "Adding. The date you input is in the future. ";
+        speechOutput = "The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
