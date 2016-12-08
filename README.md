@@ -1,10 +1,12 @@
 #todo
 
+1. FIX THE TIME BETWEEN FUNCTION, when i say "friday", when its "thursday", then it still says today
+
 1. "this week" date is off by a week... need to fix :(, but technically works
-1. saying a day without the year, or just the day always defaults to the future day. i.e. sunday means next sunday.. need to default it to last sunday?? but I cant change alexa's date interaction model :(...it will automatically pass me the date
-	need to change it to get the current year...
+
 	
-	
+1. "this weekend" defaults to friday.
+"this month" 
 	
 1. maybe i should just strip out all adverbs???? that would require making 2 diffferent custom slot types.. one of verb and then one of nounnn???????IDK loll, please dont say adverbs.
 
@@ -57,4 +59,5 @@ delete whichever specific chore
 2. handle decades given by returning error to user
 1. add in handling for day of the week/ "i cleaned on sunday"
 2. handle dates without a year??? outputs something but its incorrect
-
+1. saying a day without the year, or just the day always defaults to the future day. i.e. sunday means next sunday.. need to default it to last sunday?? but I cant change alexa's date interaction model :(...it will automatically pass me the date
+	need to change it to get the current year...

@@ -160,7 +160,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         return;
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
-		
+	/*	
         speechOutput = "The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
@@ -169,7 +169,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		response.tellWithCard(speechOutput, skillName, speechOutput)
 		
 		return;
-		
+		*/
 		
 	}
 	
@@ -200,8 +200,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
-				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + intent.slots.Date.value + "." ;
+				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + date.formatDate + "." ;
 				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
@@ -422,6 +422,7 @@ function getChoreFromIntent(intent, assignDefault) {
  */
 function getDateFromIntent(dateo) {
 
+	var today = new Date();
 	var date = new Date();
     var week = 0;
 	var day = 0;
@@ -460,8 +461,24 @@ function getDateFromIntent(dateo) {
 				}
 			}
 
-		} else {
+		//if passed only a month, then the date will be in the form "2017-12", assuming a future date
+		//we need to roll it back one year
+		} else if (dateo.length == 7) {
 			date = new Date(dateo);
+			date = date.add(-1).year();
+			
+			
+		//dealt with edge cases, now formally handle date processing
+		} else {
+			//define the current date.. this automatically adds in a day
+			date = new Date(dateo);
+			
+			//now check and see if they passed only a day (eg Sunday, Monday, etc). This would result in a real date being passed, but in the future.
+			//so check and see if the date passed is in the future by 7 or less days
+			if (date.isAfter(today.add(1).day()) && date.isBefore(today.add(7).days())){
+				date = date.add(-7).days();
+			}
+			
 		}
 		
         return {
