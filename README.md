@@ -1,5 +1,11 @@
 #todo
+NEED TO REIMPLEMENT FUTURE ERROR HANDLING
+NEED TO REIMPLEMENT DATE DISPLAYED BY THE RECORDING FUNCTION
+NEED TO FIX THE WEEKEN/WEEKEND REPORTING
+REUPLOAD LISTOFCHORES
 
+
+1.time is in UTC+0, need to assume.. central time in the US?, so UTC-6
 1. FIX THE TIME BETWEEN FUNCTION, when i say "friday", when its "thursday", then it still says today
 
 1. "this week" date is off by a week... need to fix :(, but technically works

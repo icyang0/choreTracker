@@ -427,6 +427,12 @@ function getDateFromIntent(dateo) {
     var week = 0;
 	var day = 0;
 	var nonStandardDateError = false;
+	var daysUntilWeekend = 0;
+	var todayIsWeekend = false;
+	
+	if((today.getDay == SATURDAY) || (today.getDay == SUNDAY)) {
+		todayIsWeekend = true;
+	}
 	
 	//no date passed
     if (!dateo) {
@@ -446,6 +452,10 @@ function getDateFromIntent(dateo) {
 			nonStandardDateError = true;
 		
 		//if passed a 'week' or 'weekend', 
+		//NEED TO FIGURE OUT IF ITS IN THE PAST OR FUTURE WEEKEND!!!
+		//might still just need to add days until it gets to the weekend????
+		//eg if today is saturday, then "this weekend" returns LAST" weekend.
+		//but if today is weekday, then "this weekend" returns FUTURE" weekend,,, gdi
 		} else if (dateo[5] == "W") {
 
 			week = dateo.substring(6,8);
@@ -457,7 +467,11 @@ function getDateFromIntent(dateo) {
 			if (dateo[9] == "W") {
 				//check to see if the parsed day is a weekday.. add days until it gets to the weekend
 				if ((day != SUNDAY) && (day != SATURDAY)) {
-					date = date.addDays(6 - SATURDAY); 
+					daysUntilWeekend = 0;
+					//daysUntilWeekend = 34324;
+					date = date.add(daysUntilWeekend).days(); 
+					//date = date.add(35).days(); 
+					
 				}
 			}
 
@@ -484,7 +498,8 @@ function getDateFromIntent(dateo) {
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
             origDate: dateo,
-			formatDate: date.toISOString().substring(0,10),
+			//formatDate: date.toISOString().substring(0,10),
+			formatDate: date.toISOString(),
 			error: nonStandardDateError
         }
     }
