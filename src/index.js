@@ -160,7 +160,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         return;
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
-	/*	
+		
         speechOutput = "The date you input is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
@@ -169,7 +169,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		response.tellWithCard(speechOutput, skillName, speechOutput)
 		
 		return;
-		*/
+		
 		
 	}
 	
@@ -200,8 +200,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
                 else {
                     console.log(data);
                 }
-				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
-				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + date.formatDate + "." ;
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
+				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + date.formatDate + "." ;
 				
 				response.tellWithCard(speechOut, skillName, speechOut)
             }
@@ -498,8 +498,8 @@ function getDateFromIntent(dateo) {
         return {
             displayDate: alexaDateUtil.getFormattedDate(date),
             origDate: dateo,
-			//formatDate: date.toISOString().substring(0,10),
-			formatDate: date.toISOString(),
+			formatDate: date.toISOString().substring(0,10),
+			//formatDate: date.toISOString(),
 			error: nonStandardDateError
         }
     }
