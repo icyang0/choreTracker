@@ -96,13 +96,13 @@ TidePooler.prototype.intentHandlers = {
 
 
 function handleWelcomeRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say something like, Alexa, tell " + skillName + " I cleaned the toilet today."
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today."
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
     response.tellWithCard(speechOut, skillName, speechOut)
 }
 
 function handleHelpRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say something like, Alexa, tell " + skillName + " I cleaned the toilet today."
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today."
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
     response.tellWithCard(speechOut, skillName, speechOut)
 }
@@ -161,7 +161,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
-        speechOutput = "The date you input is in the future. ";
+        speechOutput = "That date is in the future. ";
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
@@ -203,7 +203,8 @@ function handleAddChoreTimeRequest(intent, session, response) {
 				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
 				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + date.formatDate + "." ;
 				
-				response.tellWithCard(speechOut, skillName, speechOut)
+				//response.tellWithCard(speechOut, skillName, speechOut)
+				response.tellWithCard(speechOut, "spagnolio", speechOut)
             }
 	);
 }
