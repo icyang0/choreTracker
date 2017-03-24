@@ -98,13 +98,13 @@ TidePooler.prototype.intentHandlers = {
 function handleWelcomeRequest(response) {
 	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today."
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
-    response.tellWithCard(speechOut, skillName, speechOut)
+    response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
 }
 
 function handleHelpRequest(response) {
 	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today."
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
-    response.tellWithCard(speechOut, skillName, speechOut)
+    response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
 }
 
 
@@ -127,7 +127,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         speechOutput = repromptText;
 
         //response.ask(speechOutput, repromptText);
-        response.tellWithCard(speechOutput, skillName, speechOutput)
+        response.tellWithCard(speechOutput, "Error", speechOutput)
 		
 		return;
     }
@@ -141,7 +141,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
         speechOutput = speechOutput + repromptText;
         //response.ask(speechOutput, repromptText);
 		
-		response.tellWithCard(speechOutput, skillName, speechOutput)
+		response.tellWithCard(speechOutput, "Error", speechOutput)
 		return;
     }
 	
@@ -155,7 +155,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		
 		speechOutput = speechOutput + repromptText;
         //response.ask(speechOutput, repromptText);
-		response.tellWithCard(speechOutput, skillName, speechOutput)
+		response.tellWithCard(speechOutput, "Error", speechOutput)
 
         return;
 	//if the person inputter a date more than a year in the future
@@ -166,7 +166,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		
 		speechOutput = speechOutput + repromptText;
 		//response.ask(speechOutput, repromptText);
-		response.tellWithCard(speechOutput, skillName, speechOutput)
+		response.tellWithCard(speechOutput, "Error", speechOutput)
 		
 		return;
 		
@@ -204,7 +204,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + date.formatDate + "." ;
 				
 				//response.tellWithCard(speechOut, skillName, speechOut)
-				response.tellWithCard(speechOut, "spagnolio", speechOut)
+				response.tellWithCard(speechOut, "Chore Added!", speechOut)
             }
 	);
 }
@@ -228,7 +228,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
         speechOutput = repromptText;
 
         //response.ask(speechOutput, repromptText);
-		response.tellWithCard(speechOutput, skillName, speechOutput)
+		response.tellWithCard(speechOutput, "Error", speechOutput)
         return;
     }
 	var date;
@@ -253,17 +253,26 @@ function handleTellChoreTimeRequest(intent, session, response) {
         }, function (err, data) {
             var currentChore;
             if (err) {
-                speechOut = "ERROR OF SOME SORT";
+                //speechOut = "ERROR OF SOME SORT";
+				speechOutput = "Unknown database error. Please try again.";
+				response.tellWithCard(speechOut, "Error", speechOut)
+				return;
 			
 			//if we couldsnt find the thingey
             } else if (data.Item === undefined) {
                 speechOut = "I don't have data about when you "+ choreName + ". Please try again.";
+				response.tellWithCard(speechOut, "Error", speechOut)
+				return;
+				
             } else {
                 currentChoreDate = data.Item.DateOfChore.S;
 				
 				date = getDateFromIntent(currentChoreDate);
 				if (date.error) {
-					speechOutput = "Something wrong with database date";
+					//speechOutput = "Something wrong with database date";
+					speechOutput = "Unknown database error. Please try again.";
+					response.tellWithCard(speechOut, "Error", speechOut)
+					return;
 				}
 	
 				//determine how long ago date was from today
@@ -271,11 +280,16 @@ function handleTellChoreTimeRequest(intent, session, response) {
 				//this should never be called since it should stop at date... putting it here just in case??
 				if (howLong.error) {
 		
-					speechOutput = "Something wrong with finding how long from database date";
+					//speechOutput = "Something wrong with finding how long from database date";
+					speechOutput = "Unknown database error. Please try again.";
+					response.tellWithCard(speechOut, "Error", speechOut)
+					return;
        
 				//if the person inputter a date more than a year in the future.. shouldnt get to this state
 				} else if (howLong.fError) {
-					speechOutput = "The date from database is in future. ";
+					speechOutput = "The date from database is from the future. ";
+					response.tellWithCard(speechOut, "Error", speechOut)
+					return;
 				}
 				
 				howLongStr = howLong.displayLong;
@@ -284,7 +298,7 @@ function handleTellChoreTimeRequest(intent, session, response) {
 				speechOut = "The last time you " + choreName + " was " + howLongStr + ", on " + dateDisplay + ".";
             }
 
-			response.tellWithCard(speechOut, skillName, speechOut)
+			response.tellWithCard(speechOut, "Chore Recalled!", speechOut)
 				
     });
 
