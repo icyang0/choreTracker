@@ -85,7 +85,7 @@ var alexaDateUtil = (function () {
             var today = new Date();
 
             if (today.getFullYear() === date.getFullYear()) {
-                return DAYS_OF_WEEK[date.getDay()] + ' ' + MONTHS[date.getMonth()] + ' ' + DAYS_OF_MONTH[date.getDate() - 1];
+                return DAYS_OF_WEEK[date.getDay()] + ' ' + MONTHS[date.getMonth()] + ' ' + DAYS_OF_MONTH[date.getDate() - 1] + ' ' + date.getFullYear();
             } else {
                 return DAYS_OF_WEEK[date.getDay()] + ' ' + (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
             }

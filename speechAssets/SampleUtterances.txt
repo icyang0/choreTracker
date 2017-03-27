@@ -1,10 +1,15 @@
 
 
+AddChoreTimeIntent on {Date} I {ChoreName}
 AddChoreTimeIntent {Date} I {ChoreName}
 AddChoreTimeIntent that {Date} I {ChoreName}
+AddChoreTimeIntent that on {Date} I {ChoreName}
+AddChoreTimeIntent to remember that on {Date} I {ChoreName}
 AddChoreTimeIntent to remember that {Date} I {ChoreName}
+AddChoreTimeIntent that I {ChoreName} in {Date}
 AddChoreTimeIntent that I {ChoreName} {Date}
 AddChoreTimeIntent that I {ChoreName} on {Date}
+AddChoreTimeIntent to remember that I {ChoreName} in {Date}
 AddChoreTimeIntent to remember that I {ChoreName} {Date}
 AddChoreTimeIntent to remember that I {ChoreName} on {Date}
 

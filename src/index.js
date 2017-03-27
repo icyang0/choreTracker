@@ -497,6 +497,15 @@ function getDateFromIntent(dateo) {
 			date = date.add(-1).year();
 			
 			
+		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
+		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
+		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
+		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
+		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
+		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
+		//if it's only 1 year ahead, then assume	
+		} else if (dateo.year() == today.add(-1).years())	
+			
 		//dealt with edge cases, now formally handle date processing
 		} else {
 			//define the current date.. this automatically adds in a day
@@ -504,7 +513,7 @@ function getDateFromIntent(dateo) {
 			
 			//now check and see if they passed only a day (eg Sunday, Monday, etc). This would result in a real date being passed, but in the future.
 			//so check and see if the date passed is in the future by 7 or less days
-			if (date.isAfter(today.add(1).day()) && date.isBefore(today.add(7).days())){
+			if (date.isAfter(today.add(0).day()) && date.isBefore(today.add(7).days())){
 				date = date.add(-7).days();
 			}
 			
@@ -571,7 +580,6 @@ function getHowLongAgoFromIntent(dateo) {
 		howLongM = Math.trunc(howLongM);
 		howLongD = Math.trunc(howLongD);
 		
-		//1 year 
 		if (howLongY == 1){
 			
 			howLong = "about 1 year";
