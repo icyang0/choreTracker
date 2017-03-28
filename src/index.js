@@ -439,11 +439,14 @@ function getDateFromIntent(dateo) {
 
 	var today = new Date();
 	var date = new Date();
+	var testYearDate = new Date(dateo);
     var week = 0;
 	var day = 0;
 	var nonStandardDateError = false;
 	var daysUntilWeekend = 0;
 	var todayIsWeekend = false;
+	//var howLongYears = 0;
+	var howLongYears = -1;
 	
 	if((today.getDay == SATURDAY) || (today.getDay == SUNDAY)) {
 		todayIsWeekend = true;
@@ -456,6 +459,11 @@ function getDateFromIntent(dateo) {
 			displayDate: "default date"
         }
     } else {
+		
+		//totoal years passed
+		howLongYears = ((today - testYearDate)/(86400000 * 365));
+		//howLongYears = Math.trunc(howLongYears);
+		
 		
 		var season = dateo.substring(5,7);
 		//if a season passed
@@ -496,16 +504,12 @@ function getDateFromIntent(dateo) {
 			date = new Date(dateo);
 			date = date.add(-1).year();
 			
-			
-		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
-		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
-		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
-		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
-		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
-		//////////////////////////////////////////////////////////////////FIX DIS////////////////////////////////////////////	
-		//if it's only 1 year ahead, then assume	
-		} else if (dateo.year() == today.add(-1).years())	
-			
+		
+		//if it's only 1 year ahead, then assume person just passed month+day, which defaults to the future date. subtract one year.	
+		} else if (howLongYears >= -1 && howLongYears < 0){
+			date = new Date(dateo);
+			date = date.add(-365).days();
+	
 		//dealt with edge cases, now formally handle date processing
 		} else {
 			//define the current date.. this automatically adds in a day
