@@ -96,13 +96,13 @@ TidePooler.prototype.intentHandlers = {
 
 
 function handleWelcomeRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today."
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
     response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
 }
 
 function handleHelpRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today."
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
     response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
 }
