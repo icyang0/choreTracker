@@ -87,23 +87,53 @@ TidePooler.prototype.intentHandlers = {
         var speechOutput = "Bye";
         response.tell(speechOutput);
     },
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////FIX THISSSSSSSSSSSSSSSSSSSSSSSSSS/////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	"AMAZON.YesIntent": function (intent, session, response) {
+        var speechOutput = "good";
+        response.tell(speechOutput);
+    },
+	
+	"AMAZON.NoIntent": function (intent, session, response) {
+        var speechOutput = "My mistake. Please say it again.";
+        response.tell(speechOutput);
+    },
 
     "AMAZON.CancelIntent": function (intent, session, response) {
         var speechOutput = "Bye";
         response.tell(speechOutput);
     }
+	
+	
+	
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////FIX THISSSSSSSSSSSSSSSSSSSSSSSSSS/////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
 function handleWelcomeRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
-		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
-    response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
+	var speechOut = "hello this is chore tracker."
+	//var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
+	//	+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet."
+    //response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
+	var repromtText = "poop";
+    response.ask(speechOut, repromtText);
 }
 
 function handleHelpRequest(response) {
 	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
-		+ "Then remind yourself by saying, Alexa, ask " + skillName + "when I last cleaned the toilet."
+		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet."
     response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
 }
 
