@@ -102,8 +102,14 @@ TidePooler.prototype.intentHandlers = {
     },
 	
 	"AMAZON.NoIntent": function (intent, session, response) {
-        var speechOutput = "My mistake. Please say it again.";
-        response.ask(speechOutput, speechOutput);
+        var speechOutput = "My mistake. ";
+		var repromptText = "Please say it again.";
+		speechOutput = speechOutput + repromptText;
+		//session.attributes = "poop";
+        response.ask(speechOutput, repromptText);
+		
+		
+		
     },
 
     "AMAZON.CancelIntent": function (intent, session, response) {
@@ -126,13 +132,8 @@ TidePooler.prototype.intentHandlers = {
 function handleWelcomeRequest(response) {
 	var speechOut = "Welcome to Chore Tracker. ";
 	var repromptText = "Ask me to remember a " + choreOrTask + ", or remind you of one previously entered.";
-
-    response.askWithCard(speechOut, repromptText, "Welcome to " + skillName + "!", "I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. ");
 	
-	//var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
-	//	+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet."
-    //response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)	
-	//	+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet.");
+    response.askWithCard(speechOut, repromptText, "Welcome to " + skillName + "!", "I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. ");
 
 }
 
@@ -169,7 +170,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (date.error) {
         speechOutput = "I didn't understand that date. ";
-		repromptText = "Please try again by saying a date like: today, Sunday, or November tenth twenty fifteen.";
+		repromptText = "Please try again by saying a date like: today, Sunday, or November tenth.";
 		
         speechOutput = speechOutput + repromptText;
 		
@@ -183,7 +184,7 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	if (howLong.error) {
 		
         speechOutput = "I didn't understand that date. ";
-		repromptText = "Please try again by saying a date like: today, Sunday, or November tenth twenty fifteen.";
+		repromptText = "Please try again by saying a date like: today, Sunday, or November tenth.";
 		
         speechOutput = speechOutput + repromptText;
 		
@@ -202,6 +203,47 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		return;
 
 	}
+	
+	
+	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+	var choreName = choreOut.chore;
+	
+	var howLongStr = howLong.displayLong;
+	var dateDisplay = date.displayDate;
+	
+	dynamodb.putItem({
+                TableName: "ChoreAppDataTable",
+                Item: {
+                    CustomerId: {
+                        S: session.user.userId
+                    },
+					ChoreName: {
+						S: choreName
+					},
+					DateOfChore: {
+						S: date.formatDate
+					}
+                }
+            }, function (err, data) {
+                if (err) {
+                    console.log(err, err.stack);
+                }
+                else {
+                    console.log(data);
+                }
+				speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + dateDisplay + "." ;
+				//speechOut = "Okay. You " + choreName + " " + howLongStr + ", on " + date.formatDate + "." ;
+				
+				//response.tellWithCard(speechOut, skillName, speechOut)
+				response.tellWithCard(speechOut, "Chore Added!", speechOut)
+            }
+	);
+}
+
+/**
+ * actually add chore
+ */
+function saveChore(intent, session, response) {
 	
 	
 	var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
