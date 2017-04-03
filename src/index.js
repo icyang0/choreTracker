@@ -5,6 +5,7 @@ var APP_ID = "amzn1.ask.skill.2e904383-fe90-473d-9c12-e55ab8caccaf";//replace wi
 
 var skillName = "Chore Tracker";
 var choreOrTask = "chore";
+var choreOrTaskCap = "Chore";
 
 'use strict';
 require('./date');
@@ -96,13 +97,13 @@ TidePooler.prototype.intentHandlers = {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	"AMAZON.YesIntent": function (intent, session, response) {
-        var speechOutput = "good";
+        var speechOutput = "Okay. Saved!";
         response.tell(speechOutput);
     },
 	
 	"AMAZON.NoIntent": function (intent, session, response) {
         var speechOutput = "My mistake. Please say it again.";
-        response.tell(speechOutput);
+        response.ask(speechOutput, speechOutput);
     },
 
     "AMAZON.CancelIntent": function (intent, session, response) {
@@ -123,22 +124,24 @@ TidePooler.prototype.intentHandlers = {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 function handleWelcomeRequest(response) {
-	var speechOut = "hello this is chore tracker."
+	var speechOut = "Welcome to Chore Tracker. ";
+	var repromptText = "Ask me to remember a " + choreOrTask + ", or remind you of one previously entered.";
+
+    response.askWithCard(speechOut, repromptText, "Welcome to " + skillName + "!", "I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. ");
+	
 	//var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
 	//	+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet."
-    //response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
-	var repromtText = "poop";
-    response.ask(speechOut, repromtText);
+    //response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)	
+	//	+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet.");
+
 }
 
 function handleHelpRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
-		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet."
-    response.tellWithCard(speechOut, "How to use Chore Tracker", speechOut)
+	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". ";
+	var repromptText = "Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
+		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet.";
+    response.tellWithCard(speechOut, "How to use " + skillName, repromptText);
 }
-
-
-
 
 /**
  * This handles adding a chore
@@ -153,11 +156,11 @@ function handleAddChoreTimeRequest(intent, session, response) {
         speechOutput;
     if (choreOut.error) {
 		
-        repromptText = "I didn't understand that " + choreOrTask + ". Please try again.";
-        speechOutput = repromptText;
-
-        //response.ask(speechOutput, repromptText);
-        response.tellWithCard(speechOutput, "Error", speechOutput)
+		speechOutput = "I didn't understand that " + choreOrTask + ". ";
+        repromptText = "Please try again."
+        
+        speechOutput = speechOutput + repromptText;
+        response.askWithCard(speechOutput, repromptText, "Error", speechOutput);
 		
 		return;
     }
@@ -166,12 +169,11 @@ function handleAddChoreTimeRequest(intent, session, response) {
     var date = getDateFromIntent(intent.slots.Date.value);
 	if (date.error) {
         speechOutput = "I didn't understand that date. ";
-		repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
+		repromptText = "Please try again by saying a date like: today, Sunday, or November tenth twenty fifteen.";
 		
         speechOutput = speechOutput + repromptText;
-        //response.ask(speechOutput, repromptText);
 		
-		response.tellWithCard(speechOutput, "Error", speechOutput)
+        response.askWithCard(speechOutput, repromptText, "Error", speechOutput);
 		return;
     }
 	
@@ -180,14 +182,14 @@ function handleAddChoreTimeRequest(intent, session, response) {
 	//this should never be called since it should stop at date... putting it here just in case??
 	if (howLong.error) {
 		
-		speechOutput = "I didn't understand that date. ";
-        repromptText = "Please try again by saying a date like: today, or Sunday, or November tenth twenty fifteen.";
+        speechOutput = "I didn't understand that date. ";
+		repromptText = "Please try again by saying a date like: today, Sunday, or November tenth twenty fifteen.";
 		
-		speechOutput = speechOutput + repromptText;
-        //response.ask(speechOutput, repromptText);
-		response.tellWithCard(speechOutput, "Error", speechOutput)
-
-        return;
+        speechOutput = speechOutput + repromptText;
+		
+        response.askWithCard(speechOutput, repromptText, "Error", speechOutput);
+		return;
+		
 	//if the person inputter a date more than a year in the future
     } else if (howLong.fError) {
 		
@@ -195,12 +197,10 @@ function handleAddChoreTimeRequest(intent, session, response) {
 		repromptText = "Please try again using a date today or earlier.";
 		
 		speechOutput = speechOutput + repromptText;
-		//response.ask(speechOutput, repromptText);
-		response.tellWithCard(speechOutput, "Error", speechOutput)
+        response.askWithCard(speechOutput, repromptText, "Error", speechOutput);
 		
 		return;
-		
-		
+
 	}
 	
 	
@@ -254,12 +254,13 @@ function handleTellChoreTimeRequest(intent, session, response) {
 	//if couldnt understand the chore	
     if (choreOut.error) {
         // invalid city. move to the dialog
-        repromptText = "I couldn't understand that " + choreOrTask + ". Please try again.";
-        speechOutput = repromptText;
-
-        //response.ask(speechOutput, repromptText);
-		response.tellWithCard(speechOutput, "Error", speechOutput)
-        return;
+		speechOutput = "I didn't understand that " + choreOrTask + ". ";
+        repromptText = "Please try again."
+        
+        speechOutput = speechOutput + repromptText;
+        response.askWithCard(speechOutput, repromptText, "Error", speechOutput);
+		
+		return;
     }
 	var date;
 	
@@ -283,7 +284,6 @@ function handleTellChoreTimeRequest(intent, session, response) {
         }, function (err, data) {
             var currentChore;
             if (err) {
-                //speechOut = "ERROR OF SOME SORT";
 				speechOutput = "Unknown database error. Please try again.";
 				response.tellWithCard(speechOut, "Error", speechOut)
 				return;
