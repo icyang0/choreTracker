@@ -121,27 +121,24 @@ TidePooler.prototype.intentHandlers = {
 	
 };
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////FIX THISSSSSSSSSSSSSSSSSSSSSSSSSS/////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
 function handleWelcomeRequest(response) {
-	var speechOut = "Welcome to Chore Tracker. ";
-	var repromptText = "Ask me to remember a " + choreOrTask + ", or remind you of one previously entered.";
+	var speechOut = "Welcome to Chore Tracker. Ask me to remember a " + choreOrTask + ", or remind you of one previously entered.";
+	var repromptText = "Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
+		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet.";
+	speechOut = speechOut + repromptText;
 	
-    response.askWithCard(speechOut, repromptText, "Welcome to " + skillName + "!", "I can remind you when you last did a " + choreOrTask + ". Just say, Alexa, tell " + skillName + " I cleaned the toilet today. ");
+    response.askWithCard(speechOut, repromptText, "Welcome to " + skillName + "!", speechOut);
+	
 
 }
 
 function handleHelpRequest(response) {
-	var speechOut = "Welcome to " + skillName + "! I can remind you when you last did a " + choreOrTask + ". ";
-	var repromptText = "Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
-		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet.";
-    response.tellWithCard(speechOut, "How to use " + skillName, repromptText);
+	var speechOut = "I can remind you when you last did a " + choreOrTask + ". ";
+	var repromptText = "For example, you can say, Alexa, tell " + skillName + " I washed the car today. "
+		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last washed the car.";
+	speechOut = speechOut + repromptText;
+    response.tellWithCard(speechOut, repromptText, "How to use " + skillName, speechOut);
 }
 
 /**
