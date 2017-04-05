@@ -123,7 +123,7 @@ TidePooler.prototype.intentHandlers = {
 
 
 function handleWelcomeRequest(response) {
-	var speechOut = "Welcome to Chore Tracker. Ask me to remember a " + choreOrTask + ", or remind you of one previously entered.";
+	var speechOut = "Welcome to Chore Tracker. Ask me to remember a " + choreOrTask + ", or remind you of one previously entered. ";
 	var repromptText = "Just say, Alexa, tell " + skillName + " I cleaned the toilet today. "
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last cleaned the toilet.";
 	speechOut = speechOut + repromptText;
