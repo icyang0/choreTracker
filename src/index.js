@@ -507,7 +507,7 @@ function getChoreFromIntent(intent, assignDefault) {
 function getDateFromIntent(dateo) {
 
 	var today = new Date();
-	var date = new Date();
+	var date = new Date(dateo);
 	var testYearDate = new Date(dateo);
     var week = 0;
 	var day = 0;
@@ -534,8 +534,8 @@ function getDateFromIntent(dateo) {
 		//howLongYears = Math.trunc(howLongYears);
 		
 		
-		var season = dateo.substring(5,7);
 		//if a season passed
+		var season = dateo.substring(5,7);
 		if ((season == "WI") || (season == "SP") || (season == "SU") || (season == "FA")) {
 			nonStandardDateError = true;
 
@@ -563,17 +563,22 @@ function getDateFromIntent(dateo) {
 					//daysUntilWeekend = 34324;
 					date = date.add(daysUntilWeekend).days(); 
 					//date = date.add(35).days(); 
-					
 				}
 			}
 
+			
 		//if passed only a month, then the date will be in the form "2017-12", assuming a future date
 		//we need to roll it back one year
 		} else if (dateo.length == 7) {
 			date = new Date(dateo);
 			date = date.add(-1).year();
 			
-		
+		 //now check and see if they passed only a day (eg Sunday, Monday, etc). This would result in a real date being passed, but in the future.
+		//so check and see if the date passed is in the future by 7 or less days
+		} else if (date.isAfter(today.add(0).day()) && date.isBefore(today.add(7).days())){
+			date = date.add(-7).days();
+			
+			
 		//if it's only 1 year ahead, then assume person just passed month+day, which defaults to the future date. subtract one year.	
 		} else if (howLongYears >= -1 && howLongYears < 0){
 			date = new Date(dateo);
@@ -583,12 +588,6 @@ function getDateFromIntent(dateo) {
 		} else {
 			//define the current date.. this automatically adds in a day
 			date = new Date(dateo);
-			
-			//now check and see if they passed only a day (eg Sunday, Monday, etc). This would result in a real date being passed, but in the future.
-			//so check and see if the date passed is in the future by 7 or less days
-			if (date.isAfter(today.add(0).day()) && date.isBefore(today.add(7).days())){
-				date = date.add(-7).days();
-			}
 			
 		}
 		
