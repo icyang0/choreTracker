@@ -138,7 +138,7 @@ function handleHelpRequest(response) {
 	var repromptText = "For example, you can say, Alexa, tell " + skillName + " I washed the car today. "
 		+ "Then remind yourself by saying, Alexa, ask " + skillName + " when I last washed the car.";
 	speechOut = speechOut + repromptText;
-    response.tellWithCard(speechOut, repromptText, "How to use " + skillName, speechOut);
+    response.askWithCard(speechOut, repromptText, "How to use " + skillName, speechOut);
 }
 
 /**
